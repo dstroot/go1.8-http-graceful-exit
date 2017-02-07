@@ -81,30 +81,32 @@ func main() {
 	s := &http.Server{
 		Addr:           ":8080",
 		Handler:        n, // pass negroni
-		ReadTimeout:    10 * time.Second,
+		ReadTimeout:    5 * time.Second,
 		WriteTimeout:   10 * time.Second,
+		IdleTimeout:    120 * time.Second, // Go 1.8
 		MaxHeaderBytes: 1 << 20,
 	}
 
-	log.Printf("%s - Starting server...", hostname)
+	log.Printf("%s - Starting server on port %v...", hostname, s.Addr)
 
 	// Run server
 	go func() {
 		errChan <- s.ListenAndServe()
 	}()
 
-	// Handle channels
+	// Handle channels/graceful shutdown
 	for {
 		select {
 		case err := <-errChan:
-			if err != http.ErrServerClosed {
+			if err != http.ErrServerClosed { // Go 1.8
 				log.Fatalf("listen: %s\n", err)
 			}
 		case <-sigs:
 			fmt.Println("")
 			log.Printf("%s - Shutdown signal received, exiting...\n", hostname)
 			// shut down gracefully, but wait no longer than 5 seconds before halting
-			ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
 			s.Shutdown(ctx)
 			if err := s.Shutdown(ctx); err != nil {
 				log.Fatalf("Server could not shutdown: %v", err)
