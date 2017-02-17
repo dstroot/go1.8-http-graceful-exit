@@ -13,13 +13,12 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"path"
 	"syscall"
 	"time"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/uber-go/zap"
 	"github.com/urfave/negroni"
+	"go.uber.org/zap"
 )
 
 /**
@@ -49,41 +48,55 @@ func main() {
 		os.Exit(1)
 	}
 
-	logger := zap.New(
-		zap.NewJSONEncoder(
-			zap.RFC3339Formatter("time"), // human-readable timestamps
-			zap.MessageKey("msg"),        // customize the message key
-			zap.LevelString("level"),     // stringify the log level
-		),
-	)
+	logger, err := zap.NewProduction()
+	if err != nil {
+		log.Println(err)
+		os.Exit(1)
+	}
+	slog := logger.Sugar()
+	// logger.Infow("Failed to fetch URL.",
+	// 	// Structured context as loosely-typed key-value pairs.
+	// 	"url", url,
+	// 	"attempt", retryNum,
+	// 	"backoff", time.Second,
+	// )
+	slog.Infof("Failed to fetch URL")
 
-	logger = logger.With(
-		zap.Int("pid", os.Getpid()),
-		zap.String("exe", path.Base(os.Args[0])),
-	)
+	// logger := zap.New(
+	// 	zap.NewJSONEncoder(
+	// 		zap.RFC3339Formatter("time"), // human-readable timestamps
+	// 		zap.MessageKey("msg"),        // customize the message key
+	// 		zap.LevelString("level"),     // stringify the log level
+	// 	),
+	// )
 
-	textLogger := zap.New(zap.NewTextEncoder(
-		zap.TextTimeFormat(time.RFC822),
-	))
+	// logger = logger.With(
+	// 	zap.Int("pid", os.Getpid()),
+	// 	zap.String("exe", path.Base(os.Args[0])),
+	// )
+	//
+	// textLogger := zap.New(zap.NewTextEncoder(
+	// 	zap.TextTimeFormat(time.RFC822),
+	// ))
 
-	textLogger.Debug("This is debug data.", zap.Int("foo", 42))
-	textLogger.Info("This is a text log.", zap.Int("bar", 12))
-
-	logger.Warn("Log without structured data...")
-	logger.Warn(
-		"Or use strongly-typed wrappers to add structured context.",
-		zap.String("library", "zap"),
-		zap.Duration("latency", time.Nanosecond),
-	)
-
-	// Avoid re-serializing the same data repeatedly by creating a child logger
-	// with some attached context. That context is added to all the child's
-	// log output, but doesn't affect the parent.
-	child := logger.With(
-		zap.String("user", "jane@test.com"),
-		zap.Int("visits", 42),
-	)
-	child.Error("Oh no!")
+	// textLogger.Debug("This is debug data.", zap.Int("foo", 42))
+	// textLogger.Info("This is a text log.", zap.Int("bar", 12))
+	//
+	// logger.Warn("Log without structured data...")
+	// logger.Warn(
+	// 	"Or use strongly-typed wrappers to add structured context.",
+	// 	zap.String("library", "zap"),
+	// 	zap.Duration("latency", time.Nanosecond),
+	// )
+	//
+	// // Avoid re-serializing the same data repeatedly by creating a child logger
+	// // with some attached context. That context is added to all the child's
+	// // log output, but doesn't affect the parent.
+	// child := logger.With(
+	// 	zap.String("user", "jane@test.com"),
+	// 	zap.Int("visits", 42),
+	// )
+	// child.Error("Oh no!")
 
 	// SIGINT or SIGTERM handling
 	sigs := make(chan os.Signal, 1)

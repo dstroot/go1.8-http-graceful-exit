@@ -1,18 +1,10 @@
 {
-    "memo": "f30829cbbd4153cfe39767f4094a71bfb74ddb3f91a824359c47b523123aa626",
+    "memo": "a373329208d0b80f2a2877f58c7554d720291266bc451cd9d94ec116c431660a",
     "projects": [
         {
             "name": "github.com/julienschmidt/httprouter",
             "version": "v1.1",
             "revision": "8c199fb6259ffc1af525cc3ad52ee60ba8359669",
-            "packages": [
-                "."
-            ]
-        },
-        {
-            "name": "github.com/uber-go/zap",
-            "version": "v1.0.0-rc.1",
-            "revision": "72313cde80537dd4dc9b7b80eda6d7ed796c4232",
             "packages": [
                 "."
             ]
@@ -35,12 +27,10 @@
         },
         {
             "name": "go.uber.org/zap",
-            "branch": "master",
-            "revision": "4be2d84df3eaa9a900090bce881bd78ccd065968",
+            "version": "v1.0.0-rc.1",
+            "revision": "72313cde80537dd4dc9b7b80eda6d7ed796c4232",
             "packages": [
-                "internal/bufferpool",
-                "internal/multierror",
-                "zapcore"
+                "."
             ]
         }
     ]
