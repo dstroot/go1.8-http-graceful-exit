@@ -1,10 +1,26 @@
 {
-    "memo": "a373329208d0b80f2a2877f58c7554d720291266bc451cd9d94ec116c431660a",
+    "memo": "90e3ec5e5147bfcc3febda6d8e3465f7c1b9b49f2edc20b0bd8c538611cdc52f",
     "projects": [
+        {
+            "name": "github.com/dstroot/go_sweetpl",
+            "branch": "master",
+            "revision": "330bfe2745e2d728b003ee1d4689e1a17df6b5bf",
+            "packages": [
+                "."
+            ]
+        },
         {
             "name": "github.com/julienschmidt/httprouter",
             "version": "v1.1",
             "revision": "8c199fb6259ffc1af525cc3ad52ee60ba8359669",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/oxtoacart/bpool",
+            "branch": "master",
+            "revision": "4e1c5567d7c2dd59fa4c7c83d34c2f3528b025d6",
             "packages": [
                 "."
             ]

@@ -1,0 +1,58 @@
+{{define "head"}}
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <title>
+    Bootstrap &middot; {{ if .title}}{{.title}}{{end}}
+  </title>
+
+  <!-- Twitter -->
+  <meta name="twitter:site" content="@getbootstrap">
+  <meta name="twitter:creator" content="@getbootstrap">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Bootstrap">
+  <meta name="twitter:description" content="The most popular HTML, CSS, and JS library in the world.">
+  <meta name="twitter:image" content="http://getbootstrap.com/assets/brand/bootstrap-social.png">
+
+  <!-- Facebook -->
+  <meta property="og:url" content="http://getbootstrap.com">
+  <meta property="og:title" content="Bootstrap">
+  <meta property="og:description" content="The most popular HTML, CSS, and JS library in the world.">
+  <meta property="og:image" content="http://getbootstrap.com/assets/brand/bootstrap-social.png">
+  <meta property="og:image:secure_url" content="http://getbootstrap.com/assets/brand/bootstrap-social.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
+  <!-- Meta -->
+  <meta name="description" content="The most popular HTML, CSS, and JS library in the world.">
+  <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+
+  <!-- Bootstrap core CSS -->
+  <link href="/public/css/bootstrap.css" rel="stylesheet">
+
+  <!-- Documentation extras -->
+  <link href="/public/css/docs.min.css" rel="stylesheet">
+
+  <!-- Favicons -->
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="icon" href="/favicon.ico">
+
+  <script>
+    (function(i, s, o, g, r, a, m) {
+      i['GoogleAnalyticsObject'] = r;
+      i[r] = i[r] || function() {
+        (i[r].q = i[r].q || []).push(arguments)
+      }, i[r].l = 1 * new Date();
+      a = s.createElement(o),
+        m = s.getElementsByTagName(o)[0];
+      a.async = 1;
+      a.src = g;
+      m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+    ga('create', 'UA-146052-10', 'getbootstrap.com');
+    ga('send', 'pageview');
+  </script>
+</head>
+{{end}}

@@ -1,0 +1,63 @@
+{{define "content"}}
+  <div class="masthead-followup row m-0 border border-white">
+    <div class="col-12 col-md-4 p-3 p-md-5 bg-light border border-white">
+      <!-- Icon by Bytesize https://github.com/danklammer/bytesize-icons -->
+      <svg class="text-primary mb-2" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+      <path d="M28 22 L28 30 4 30 4 22 M16 4 L16 24 M8 16 L16 24 24 16" />
+      </svg>
+      <h3>Installation</h3>
+      <p>Include Bootstrap's source Sass and JavaScript files via Bower, Composer, Meteor, or npm. Package managed installs don't include documentation, but do include our build system and readme.</p>
+      <figure class="highlight mx-0"><pre><code class="language-sh" data-lang="sh">npm install bootstrap@4.0.0-beta</code></pre></figure>
+      <figure class="highlight mx-0"><pre><code class="language-sh" data-lang="sh">gem install bootstrap -v 4.0.0.alpha6</code></pre></figure>
+      <figure class="highlight mx-0"><pre><code class="language-sh" data-lang="sh">bower install bootstrap#v4.0.0-beta</code></pre></figure>
+      <hr class="half-rule">
+      <a class="btn btn-outline-primary" href="/docs/4.0/getting-started/download">Read installation docs</a>
+    </div>
+
+    <div class="col-12 col-md-4 p-3 p-md-5 bg-light border border-white">
+      <!-- Icon by Bytesize https://github.com/danklammer/bytesize-icons -->
+      <svg class="text-primary mb-2" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+      <path d="M9 22 C0 23 1 12 9 13 6 2 23 2 22 10 32 7 32 23 23 22 M11 26 L16 30 21 26 M16 16 L16 30" />
+    </svg>
+
+      <h3>Bootstrap CDN</h3>
+      <p>When you only need to include Bootstrap's compiled CSS or JS, you can use the Bootstrap CDN.</p>
+      <h5>CSS only</h5>
+      <figure class="highlight mx-0">
+        <pre>
+          <code class="language-html" data-lang="html">
+            <span class="nt">&lt;link</span> <span class="na">rel=</span><span class="s">"stylesheet"</span> <span class="na">href=</span><span class="s">"https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css"</span> <span class="na">integrity=</span><span class="s">"sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M"</span> <span class="na">crossorigin=</span><span class="s">"anonymous"</span><span class="nt">&gt;</span>
+          </code>
+        </pre>
+      </figure>
+
+      <h5>JS, Popper, and jQuery</h5>
+      <figure class="highlight mx-0">
+        <pre>
+          <code class="language-html" data-lang="html">
+            <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"https://code.jquery.com/jquery-3.2.1.slim.min.js"</span> <span class="na">integrity=</span><span class="s">"sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"</span> <span class="na">crossorigin=</span><span class="s">"anonymous"</span><span class="nt">&gt;&lt;/script&gt;</span>
+            <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"</span> <span class="na">integrity=</span><span class="s">"sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4"</span> <span class="na">crossorigin=</span><span class="s">"anonymous"</span><span class="nt">&gt;&lt;/script&gt;</span>
+            <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js"</span> <span class="na">integrity=</span><span class="s">"sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1"</span> <span class="na">crossorigin=</span><span class="s">"anonymous"</span><span class="nt">&gt;&lt;/script&gt;</span>
+          </code>
+        </pre>
+      </figure>
+
+      <hr class="half-rule">
+      <a class="btn btn-outline-primary" href="/docs/4.0/layout/overview/">Explore the docs</a>
+    </div>
+
+    <div class="col-12 col-md-4 p-3 p-md-5 bg-light border border-white">
+      <!-- Icon by Bytesize https://github.com/danklammer/bytesize-icons -->
+      <svg class="text-primary mb-2" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+      <path d="M18 13 L26 2 8 13 14 19 6 30 24 19 Z" />
+    </svg>
+      <h3>Official Themes</h3>
+      <p>
+        Take Bootstrap 4 to the next level with official premium themes—toolkits built on Bootstrap with new components and plugins, docs, and build tools.
+      </p>
+      <img class="img-fluid mt-3 mx-auto" src="/public/img/bootstrap-themes.png" alt="Bootstrap Themes" width="1024" height="388">
+      <hr class="half-rule">
+      <a href="https://themes.getbootstrap.com" class="btn btn-outline-primary">Browse themes</a>
+    </div>
+  </div>
+{{end}}

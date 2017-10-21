@@ -16,19 +16,44 @@ import (
 	"syscall"
 	"time"
 
+	temple "github.com/dstroot/go_sweetpl"
 	"github.com/julienschmidt/httprouter"
 	"github.com/urfave/negroni"
-	"go.uber.org/zap"
 )
+
+// var tpl temple.SweeTpl
+
+var st = &temple.SweeTpl{
+	Loader: &temple.DirLoader{
+		BasePath: templatePath,
+	},
+}
+
+var data = &temple.TemplateData{
+	Title: "Hello World",
+	Data: map[string]interface{}{
+		"Key":   "Value",
+		"Slice": []string{"One", "Two", "Three"},
+	},
+}
 
 /**
  * Handlers
  */
 
 // Index handler handles GET /
+// func Index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+// 	time.Sleep(1 * time.Second)
+// 	fmt.Fprint(w, "Welcome!\n")
+// }
+
 func Index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	time.Sleep(1 * time.Second)
-	fmt.Fprint(w, "Welcome!\n")
+	// err := renderTemplate(w, "index.html", nil)
+	// if err != nil {
+	// 	log.Fatalln(err)
+	// }
+
+	st.Render(w, "index.html", nil)
 }
 
 // Hello handler handles GET /hello/:name
@@ -48,56 +73,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	logger, err := zap.NewProduction()
-	if err != nil {
-		log.Println(err)
-		os.Exit(1)
-	}
-	slog := logger.Sugar()
-	// logger.Infow("Failed to fetch URL.",
-	// 	// Structured context as loosely-typed key-value pairs.
-	// 	"url", url,
-	// 	"attempt", retryNum,
-	// 	"backoff", time.Second,
-	// )
-	slog.Infof("Failed to fetch URL")
-
-	// logger := zap.New(
-	// 	zap.NewJSONEncoder(
-	// 		zap.RFC3339Formatter("time"), // human-readable timestamps
-	// 		zap.MessageKey("msg"),        // customize the message key
-	// 		zap.LevelString("level"),     // stringify the log level
-	// 	),
-	// )
-
-	// logger = logger.With(
-	// 	zap.Int("pid", os.Getpid()),
-	// 	zap.String("exe", path.Base(os.Args[0])),
-	// )
-	//
-	// textLogger := zap.New(zap.NewTextEncoder(
-	// 	zap.TextTimeFormat(time.RFC822),
-	// ))
-
-	// textLogger.Debug("This is debug data.", zap.Int("foo", 42))
-	// textLogger.Info("This is a text log.", zap.Int("bar", 12))
-	//
-	// logger.Warn("Log without structured data...")
-	// logger.Warn(
-	// 	"Or use strongly-typed wrappers to add structured context.",
-	// 	zap.String("library", "zap"),
-	// 	zap.Duration("latency", time.Nanosecond),
-	// )
-	//
-	// // Avoid re-serializing the same data repeatedly by creating a child logger
-	// // with some attached context. That context is added to all the child's
-	// // log output, but doesn't affect the parent.
-	// child := logger.With(
-	// 	zap.String("user", "jane@test.com"),
-	// 	zap.Int("visits", 42),
-	// )
-	// child.Error("Oh no!")
-
 	// SIGINT or SIGTERM handling
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
@@ -115,6 +90,9 @@ func main() {
 	r.GET("/", Index)
 	r.GET("/hello/:name", Hello)
 
+	// handler for serving files
+	r.ServeFiles("/public/*filepath", http.Dir("public"))
+
 	/**
 	 * Negroni Middleware Stack
 	 */
@@ -130,8 +108,8 @@ func main() {
 
 	// Create Server
 	s := &http.Server{
-		Addr:           ":8080",
-		Handler:        n, // pass negroni
+		Addr:           ":8000",
+		Handler:        n, // pass in negroni
 		ReadTimeout:    5 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		IdleTimeout:    120 * time.Second, // Go 1.8
