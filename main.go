@@ -21,8 +21,6 @@ import (
 	"github.com/urfave/negroni"
 )
 
-// var tpl temple.SweeTpl
-
 var st = &temple.SweeTpl{
 	Loader: &temple.DirLoader{
 		BasePath: templatePath,
@@ -40,12 +38,6 @@ var data = &temple.TemplateData{
 /**
  * Handlers
  */
-
-// Index handler handles GET /
-// func Index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-// 	time.Sleep(1 * time.Second)
-// 	fmt.Fprint(w, "Welcome!\n")
-// }
 
 func Index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	// err := renderTemplate(w, "index.html", nil)
