@@ -40,6 +40,21 @@ func index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	}
 }
 
+func page(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	// page data to render page
+	data := map[string]interface{}{
+		"title": "Page 2",
+		"Key":   "Value",
+		"Slice": []string{"One", "Two", "Three"},
+	}
+
+	// render page template
+	err := renderTemplate(w, "page.html", data)
+	if err != nil {
+		log.Fatalln(err)
+	}
+}
+
 // hello handler handles GET /hello/:name
 func hello(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	fmt.Fprintf(w, "hello, %s!\n", p.ByName("name"))
@@ -75,6 +90,7 @@ func main() {
 
 	// Routes
 	r.GET("/", index)
+	r.GET("/", page)
 	r.GET("/hello/:name", hello)
 
 	// handler for serving files
