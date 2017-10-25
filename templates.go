@@ -1,9 +1,3 @@
-// https://tylerchr.blog/golang-18-whats-coming/
-
-// It is now possible to call srv.Close() to halt an
-// http.Server immediately, or srv.Shutdown(ctx) to stop
-// and gracefully drain the server of connections
-
 package main
 
 import (
@@ -31,11 +25,6 @@ const (
 	templateBaseLayout  = "layout"
 	templateDirectory   = "templates"
 )
-
-// type pageData struct {
-// 	title string
-// 	data  map[string]interface{}
-// }
 
 // create a buffer pool
 func initBufferPool() {
@@ -91,6 +80,7 @@ func renderTemplate(w http.ResponseWriter, name string, data map[string]interfac
 	buf := bufpool.Get()
 	defer bufpool.Put(buf)
 
+	// render the template
 	err := tmpl.ExecuteTemplate(buf, templateBaseLayout, data)
 	if err != nil {
 		return err
