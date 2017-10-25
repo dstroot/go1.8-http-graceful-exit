@@ -90,7 +90,7 @@ func main() {
 
 	// Routes
 	r.GET("/", index)
-	r.GET("/", page)
+	r.GET("/page", page)
 	r.GET("/hello/:name", hello)
 
 	// handler for serving files
