@@ -16,40 +16,32 @@ import (
 	"syscall"
 	"time"
 
-	temple "github.com/dstroot/go_sweetpl"
 	"github.com/julienschmidt/httprouter"
 	"github.com/urfave/negroni"
 )
-
-var st = &temple.SweeTpl{
-	Loader: &temple.DirLoader{
-		BasePath: templatePath,
-	},
-}
-
-var data = &temple.TemplateData{
-	Title: "Hello World",
-	Data: map[string]interface{}{
-		"Key":   "Value",
-		"Slice": []string{"One", "Two", "Three"},
-	},
-}
 
 /**
  * Handlers
  */
 
-func Index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	// err := renderTemplate(w, "index.html", nil)
-	// if err != nil {
-	// 	log.Fatalln(err)
-	// }
+// index handler handles GET /
+func index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	// page data to render page
+	data := map[string]interface{}{
+		"title": "The most popular HTML, CSS, and JS library in the world.",
+		"Key":   "Value",
+		"Slice": []string{"One", "Two", "Three"},
+	}
 
-	st.Render(w, "index.html", nil)
+	// render page template
+	err := renderTemplate(w, "index.html", data)
+	if err != nil {
+		log.Fatalln(err)
+	}
 }
 
-// Hello handler handles GET /hello/:name
-func Hello(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+// hello handler handles GET /hello/:name
+func hello(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	fmt.Fprintf(w, "hello, %s!\n", p.ByName("name"))
 }
 
@@ -58,6 +50,9 @@ func Hello(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
  */
 
 func main() {
+
+	initBufferPool()
+	loadTemplates()
 
 	hostname, err := os.Hostname()
 	if err != nil {
@@ -79,8 +74,8 @@ func main() {
 	r := httprouter.New()
 
 	// Routes
-	r.GET("/", Index)
-	r.GET("/hello/:name", Hello)
+	r.GET("/", index)
+	r.GET("/hello/:name", hello)
 
 	// handler for serving files
 	r.ServeFiles("/public/*filepath", http.Dir("public"))
