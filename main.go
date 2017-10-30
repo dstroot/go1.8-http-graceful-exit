@@ -114,7 +114,7 @@ func main() {
 	r.GET("/page", page)
 	r.GET("/hello/:name", hello)
 
-	// handler for serving files
+	// handler for serving static files
 	r.ServeFiles("/public/*filepath", http.Dir("public"))
 
 	/**
@@ -127,7 +127,7 @@ func main() {
 	n.UseHandler(r)
 
 	/**
-	 * Service connections
+	 * Service http connections
 	 */
 
 	// Create Server

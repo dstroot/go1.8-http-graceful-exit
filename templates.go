@@ -31,7 +31,7 @@ func initBufferPool() {
 	bufpool = bpool.NewBufferPool(64)
 }
 
-// Load templates on program initialisation
+// Load templates on program initialization
 func loadTemplates() {
 	if templates == nil {
 		templates = make(map[string]*template.Template)
