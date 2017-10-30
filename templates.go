@@ -10,6 +10,15 @@ import (
 	"github.com/oxtoacart/bpool"
 )
 
+const (
+	templateDirectory   = "templates"
+	templateLayoutPath  = "layouts"
+	templatePartialPath = "partials"
+	templatePagePath    = "pages"
+	templateExtension   = ".html"
+	templateBaseLayout  = "layout"
+)
+
 /**
  * Template Handling
  */
@@ -17,19 +26,9 @@ import (
 var bufpool *bpool.BufferPool
 var templates map[string]*template.Template
 
-const (
-	templateLayoutPath  = "layouts"
-	templatePartialPath = "partials"
-	templatePagePath    = "pages"
-	templateExtension   = ".html"
-	templateBaseLayout  = "layout"
-	templateDirectory   = "templates"
-)
-
 // create a buffer pool
 func initBufferPool() {
 	bufpool = bpool.NewBufferPool(64)
-	// log.Println("buffer allocation successful")
 }
 
 // Load templates on program initialisation
@@ -38,24 +37,27 @@ func loadTemplates() {
 		templates = make(map[string]*template.Template)
 	}
 
+	// get layouts
 	layouts, err := filepath.Glob(templateDirectory + "/" + templateLayoutPath + "/*" + templateExtension)
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	// get includes
 	includes, err := filepath.Glob(templateDirectory + "/" + templatePartialPath + "/*" + templateExtension)
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	// get pages
 	pages, err := filepath.Glob(templateDirectory + "/" + templatePagePath + "/*" + templateExtension)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Generate our templates map from our layouts/ and includes/ directories
+	// Generate our templates map - one for each page
+	files := append(layouts, includes...)
 	for _, page := range pages {
-		files := append(layouts, includes...)
 		files = append(files, page)
 		templates[filepath.Base(page)] = template.Must(template.ParseFiles(files...))
 	}
@@ -80,7 +82,7 @@ func renderTemplate(w http.ResponseWriter, name string, data map[string]interfac
 	buf := bufpool.Get()
 	defer bufpool.Put(buf)
 
-	// render the template
+	// render the template and check for errors
 	err := tmpl.ExecuteTemplate(buf, templateBaseLayout, data)
 	if err != nil {
 		return err

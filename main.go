@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/http/httputil"
 	"os"
 	"os/signal"
 	"syscall"
@@ -26,6 +27,25 @@ import (
 
 // index handler handles GET /
 func index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+
+	// If you want to debug your HTTP requests, all you really need to do
+	// is import the net/http/httputil package, and invoke DumpRequest
+	// with the parameter *http.Request and a boolean to specify if you
+	// want to dump the request body as well. The function returns a
+	// []byte, error, and you could use it like this:
+	dump := func(r *http.Request) {
+		output, err := httputil.DumpRequest(r, true)
+		if err != nil {
+			fmt.Println("Error dumping request:", err)
+			return
+		}
+		fmt.Println(string(output))
+	}
+
+	// The function call will dump your request method, URI with
+	// query parameters, headers and request body if you have one.
+	dump(r)
+
 	// page data to render page
 	data := map[string]interface{}{
 		"title": "The most popular HTML, CSS, and JS library in the world.",
@@ -36,7 +56,8 @@ func index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	// render page template
 	err := renderTemplate(w, "index.html", data)
 	if err != nil {
-		log.Fatalln(err)
+		fmt.Println("Error rendering:", err)
+		return
 	}
 }
 
