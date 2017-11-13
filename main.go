@@ -8,6 +8,7 @@ package main
 
 import (
 	"context"
+	"expvar"
 	"fmt"
 	"log"
 	"net/http"
@@ -17,6 +18,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/dstroot/go1.8-http-graceful-exit/pkg"
 	"github.com/julienschmidt/httprouter"
 	"github.com/urfave/negroni"
 )
@@ -28,15 +30,15 @@ import (
 // index handler handles GET /
 func index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
-	// If you want to debug your HTTP requests, all you really need to do
-	// is import the net/http/httputil package, and invoke DumpRequest
+	// If you want to debug your HTTP requests, then import the
+	// net/http/httputil package, and invoke DumpRequest
 	// with the parameter *http.Request and a boolean to specify if you
 	// want to dump the request body as well. The function returns a
-	// []byte, error, and you could use it like this:
+	// []byte, error. You could use it like this:
 	dump := func(r *http.Request) {
 		output, err := httputil.DumpRequest(r, true)
 		if err != nil {
-			fmt.Println("Error dumping request:", err)
+			log.Println("Error dumping request:", err)
 			return
 		}
 		fmt.Println(string(output))
@@ -54,9 +56,9 @@ func index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	}
 
 	// render page template
-	err := renderTemplate(w, "index.html", data)
+	err := tmpl.RenderTemplate(w, "index.html", data)
 	if err != nil {
-		fmt.Println("Error rendering:", err)
+		log.Println("Error rendering:", err)
 		return
 	}
 }
@@ -70,7 +72,7 @@ func page(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	}
 
 	// render page template
-	err := renderTemplate(w, "page.html", data)
+	err := tmpl.RenderTemplate(w, "page.html", data)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -87,9 +89,11 @@ func hello(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
 func main() {
 
-	initBufferPool()
-	loadTemplates()
+	// template processing
+	tmpl.InitBufferPool()
+	tmpl.LoadTemplates()
 
+	// get hostname
 	hostname, err := os.Hostname()
 	if err != nil {
 		log.Println(err)
@@ -114,6 +118,9 @@ func main() {
 	r.GET("/page", page)
 	r.GET("/hello/:name", hello)
 
+	// handler for serving expvar data
+	r.Handler("GET", "/debug/vars", expvar.Handler())
+
 	// handler for serving static files
 	r.ServeFiles("/public/*filepath", http.Dir("public"))
 
@@ -136,7 +143,7 @@ func main() {
 		Handler:        n, // pass in negroni
 		ReadTimeout:    5 * time.Second,
 		WriteTimeout:   10 * time.Second,
-		IdleTimeout:    120 * time.Second, // Go 1.8
+		IdleTimeout:    120 * time.Second, // >Go 1.8
 		MaxHeaderBytes: 1 << 20,
 	}
 

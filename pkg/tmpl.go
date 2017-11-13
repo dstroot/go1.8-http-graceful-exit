@@ -1,4 +1,4 @@
-package main
+package tmpl
 
 import (
 	"fmt"
@@ -26,13 +26,13 @@ const (
 var bufpool *bpool.BufferPool
 var templates map[string]*template.Template
 
-// create a buffer pool
-func initBufferPool() {
+// InitBufferPool create a buffer pool
+func InitBufferPool() {
 	bufpool = bpool.NewBufferPool(64)
 }
 
-// Load templates on program initialization
-func loadTemplates() {
+// LoadTemplates loads templates on program initialization
+func LoadTemplates() {
 	if templates == nil {
 		templates = make(map[string]*template.Template)
 	}
@@ -68,10 +68,10 @@ func loadTemplates() {
 	// log.Println("templates loading successful")
 }
 
-// renderTemplate is a wrapper around template.ExecuteTemplate.
+// RenderTemplate is a wrapper around template.ExecuteTemplate.
 // It writes into a bytes.Buffer before writing to the http.ResponseWriter to catch
 // any errors resulting from populating the template.
-func renderTemplate(w http.ResponseWriter, name string, data map[string]interface{}) error {
+func RenderTemplate(w http.ResponseWriter, name string, data map[string]interface{}) error {
 	// Ensure the template exists in the map.
 	tmpl, ok := templates[name]
 	if !ok {
