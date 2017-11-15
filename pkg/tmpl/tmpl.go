@@ -1,3 +1,7 @@
+// This is a package that handles template rendering the way I like to do it.
+// There are others out there.  This one is pretty good:
+// https://github.com/thedevsaddam/renderer/blob/master/renderer.go
+// it also handles multiple types of rendering other than just templates.
 package tmpl
 
 import (
@@ -62,10 +66,10 @@ func LoadTemplates() {
 		templates[filepath.Base(page)] = template.Must(template.ParseFiles(files...))
 	}
 
+	// // Show loaded templates
 	// for key := range templates {
 	// 	fmt.Println("Page: ", key)
 	// }
-	// log.Println("templates loading successful")
 }
 
 // RenderTemplate is a wrapper around template.ExecuteTemplate.
