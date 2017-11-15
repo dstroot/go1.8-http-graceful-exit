@@ -22,13 +22,9 @@ import (
 func main() {
 
 	// Get hostname
-	hostname, err := os.Hostname()
-	if err != nil {
-		log.Println(err)
-		os.Exit(1)
-	}
+	hostname, _ := os.Hostname()
 
-	// SIGINT or SIGTERM handling
+	// SIGINT/SIGTERM handling
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
