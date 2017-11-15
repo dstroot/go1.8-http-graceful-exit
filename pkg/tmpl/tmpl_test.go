@@ -12,6 +12,7 @@ func TestBuildOptions(t *testing.T) {
 	// instantiate a template renderer
 	render := New()
 
+	// set defaults
 	render.buildOptions()
 
 	// test data

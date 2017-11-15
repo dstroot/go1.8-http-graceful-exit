@@ -38,6 +38,7 @@ func TestIndex(t *testing.T) {
 			ctype, "text/html; charset=utf-8")
 	}
 
+	// Check the response body contains what we expect
 	expected := "Bootstrap &middot; The most popular HTML, CSS, and JS library in the world."
 	if !strings.Contains(rr.Body.String(), expected) {
 		t.Errorf("handler returned unexpected body: got %v want %v",

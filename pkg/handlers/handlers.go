@@ -8,10 +8,10 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
+// Render is exported so we can change the options in our test files
 var Render = tmpl.New(
 	tmpl.Options{
 		TemplateDirectory: "./templates",
-		// TemplateDirectory: "../../templates",
 	},
 )
 
@@ -53,12 +53,6 @@ func Index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 // Page handles page
 func Page(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	// render := tmpl.New(
-	// 	tmpl.Options{
-	// 		TemplateDirectory: "./templates",
-	// 		// TemplateDirectory: "../../templates",
-	// 	},
-	// )
 
 	// page data to render page
 	data := map[string]interface{}{
