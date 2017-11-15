@@ -1,8 +1,8 @@
-// https://tylerchr.blog/golang-18-whats-coming/
-
-// It is now possible to call srv.Close() to halt an
+// This is an example of a simple webserver with a graceful
+// shutdown. It is now possible to call srv.Close() to halt an
 // http.Server immediately, or srv.Shutdown(ctx) to stop
-// and gracefully drain the server of connections
+// and gracefully drain the server of connections. We are using
+// httprouter and negroni also.
 package main
 
 import (
@@ -16,19 +16,14 @@ import (
 	"time"
 
 	"github.com/dstroot/go1.8-http-graceful-exit/pkg/router"
-	"github.com/dstroot/go1.8-http-graceful-exit/pkg/tmpl"
 	"github.com/urfave/negroni"
 )
-
-/**
- * Main
- */
 
 func main() {
 
 	// Template setup
-	tmpl.InitBufferPool()
-	tmpl.LoadTemplates()
+	// tmpl.InitBufferPool()
+	// tmpl.LoadTemplates()
 
 	// Get hostname
 	hostname, err := os.Hostname()
@@ -51,7 +46,7 @@ func main() {
 	n := negroni.New()
 	n.Use(negroni.NewRecovery())
 	n.Use(negroni.NewLogger())
-	n.UseHandler(r)
+	n.UseHandler(r) // pass router to negroni
 
 	// Create Server
 	s := &http.Server{

@@ -77,6 +77,7 @@ todo:
 	@grep \
 	--exclude-dir=vendor \
 	--exclude-dir=node_modules \
+	--exclude-dir=public \
 	--exclude=Makefile \
 	--text \
 	--color \

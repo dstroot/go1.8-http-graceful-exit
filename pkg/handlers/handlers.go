@@ -10,12 +10,15 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-/**
- * Handlers
- */
-
 // Index handler handles GET /
 func Index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+
+	render := tmpl.New(
+		tmpl.Options{
+			TemplateDirectory: "./templates",
+			// TemplateDirectory: "../../templates",
+		},
+	)
 
 	// If you want to debug your HTTP requests, then import the
 	// net/http/httputil package, and invoke DumpRequest
@@ -43,15 +46,22 @@ func Index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	}
 
 	// render page template
-	err := tmpl.RenderTemplate(w, "index.html", data)
+	err := render.RenderTemplate(w, "index.html", data)
 	if err != nil {
-		log.Println("Error rendering:", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 }
 
 // Page handles page
 func Page(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	render := tmpl.New(
+		tmpl.Options{
+			TemplateDirectory: "./templates",
+			// TemplateDirectory: "../../templates",
+		},
+	)
+
 	// page data to render page
 	data := map[string]interface{}{
 		"title": "Page 2",
@@ -60,7 +70,7 @@ func Page(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	}
 
 	// render page template
-	err := tmpl.RenderTemplate(w, "page.html", data)
+	err := render.RenderTemplate(w, "page.html", data)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -68,5 +78,5 @@ func Page(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 // Hello handler handles GET /hello/:name
 func Hello(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	fmt.Fprintf(w, "hello, %s!\n", p.ByName("name"))
+	fmt.Fprintf(w, "Hello, %s!\n", p.ByName("name"))
 }

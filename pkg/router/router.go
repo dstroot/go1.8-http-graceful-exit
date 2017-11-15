@@ -10,6 +10,7 @@ import (
 
 // New creates a new router with our routes
 func New() *httprouter.Router {
+
 	r := httprouter.New()
 
 	// Routes
