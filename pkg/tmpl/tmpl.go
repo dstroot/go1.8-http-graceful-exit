@@ -114,10 +114,6 @@ func (r *Render) parseTemplates() {
 		log.Fatal(err)
 	}
 
-	// log.Println(filepath.Join(r.opts.TemplateDirectory, r.opts.TemplateLayoutPath, "*"+r.opts.TemplateExtension))
-	// log.Println(filepath.Join(r.opts.TemplateDirectory, r.opts.TemplatePartialPath, "*"+r.opts.TemplateExtension))
-	// log.Println(filepath.Join(r.opts.TemplateDirectory, r.opts.TemplatePagePath, "*"+r.opts.TemplateExtension))
-
 	// Generate our templates map - one for each page
 	files := append(layouts, includes...)
 	for _, page := range pages {

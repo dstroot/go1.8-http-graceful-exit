@@ -11,6 +11,7 @@ import (
 
 func TestRoutes(t *testing.T) {
 
+	// set template path
 	handlers.Render = tmpl.New(
 		tmpl.Options{
 			TemplateDirectory: "../../templates",
@@ -50,7 +51,7 @@ func TestRoutes(t *testing.T) {
 
 		// check response
 		if respRec.Code != r.status {
-			t.Fatal("route ", r.route, " returned ", respRec.Code, " instead of ", r.status)
+			t.Error("route ", r.route, " returned ", respRec.Code, " instead of ", r.status)
 		}
 	}
 }
