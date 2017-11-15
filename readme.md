@@ -22,19 +22,21 @@ The repo is structured as follows:
 ├── Gopkg.lock          # Using dep as our package manager
 ├── Gopkg.toml          # Using dep as our package manager
 ├── Makefile            # Filled with magic...       
-├── pkg                 # a golang package
-│   ├── router
-|	|	├── router.go
+├── pkg                 # Go app packages
 │   ├── handlers
-|	|	├── handlers.go
+|   |   ├── handlers.go
+|   |   └── handlers_test.go
+│   ├── router
+|   |   ├── router.go
+|   |   └── router_test.go
 │   └── tmpl
-|		└── tmpl.go
+|      ├── tmpl.go
+|      └── tmpl_test.go
 ├── VERSION             # What version are we?
 ├── vendor              # Our vendor libraries
-└── main.go             # a `main` file so that one can reference 
-                        # the project from the repository name.
+├── main.go             # a `main` file so that one can reference 
+└── main_test.go        # the project from the repository name
 ```
-
 
 #### References
 
