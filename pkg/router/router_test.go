@@ -4,9 +4,19 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/dstroot/go1.8-http-graceful-exit/pkg/handlers"
+	"github.com/dstroot/go1.8-http-graceful-exit/pkg/tmpl"
 )
 
 func TestRoutes(t *testing.T) {
+
+	handlers.Render = tmpl.New(
+		tmpl.Options{
+			TemplateDirectory: "../../templates",
+		},
+	)
+
 	// test data
 	var routes = []struct {
 		method string

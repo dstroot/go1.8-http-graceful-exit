@@ -21,10 +21,6 @@ import (
 
 func main() {
 
-	// Template setup
-	// tmpl.InitBufferPool()
-	// tmpl.LoadTemplates()
-
 	// Get hostname
 	hostname, err := os.Hostname()
 	if err != nil {

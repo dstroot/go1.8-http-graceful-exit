@@ -3,12 +3,20 @@ package handlers
 import (
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
+	"github.com/dstroot/go1.8-http-graceful-exit/pkg/tmpl"
 	"github.com/julienschmidt/httprouter"
 )
 
 func TestIndex(t *testing.T) {
+	// set template relative path
+	Render = tmpl.New(
+		tmpl.Options{
+			TemplateDirectory: "../../templates",
+		},
+	)
 
 	router := httprouter.New()
 	router.GET("/", Index)
@@ -30,14 +38,20 @@ func TestIndex(t *testing.T) {
 			ctype, "text/html; charset=utf-8")
 	}
 
-	// // Check the response body is what we expect.
-	// if expected := `{"alive": true}`; rr.Body.String() != expected {
-	// 	t.Errorf("handler returned unexpected body: got %v want %v",
-	// 		rr.Body.String(), expected)
-	// }
+	expected := "Bootstrap &middot; The most popular HTML, CSS, and JS library in the world."
+	if !strings.Contains(rr.Body.String(), expected) {
+		t.Errorf("handler returned unexpected body: got %v want %v",
+			rr.Body.String(), expected)
+	}
 }
 
 func TestPage(t *testing.T) {
+	// set template relative path
+	Render = tmpl.New(
+		tmpl.Options{
+			TemplateDirectory: "../../templates",
+		},
+	)
 
 	router := httprouter.New()
 	router.GET("/page", Page)
@@ -59,11 +73,12 @@ func TestPage(t *testing.T) {
 			ctype, "text/html; charset=utf-8")
 	}
 
-	// // Check the response body is what we expect.
-	// if expected := `{"alive": true}`; rr.Body.String() != expected {
-	// 	t.Errorf("handler returned unexpected body: got %v want %v",
-	// 		rr.Body.String(), expected)
-	// }
+	// Check the response body contains what we expect
+	expected := "Bootstrap &middot; Page 2"
+	if !strings.Contains(rr.Body.String(), expected) {
+		t.Errorf("handler returned unexpected body: got %v want %v",
+			rr.Body.String(), expected)
+	}
 }
 
 func TestHello(t *testing.T) {
