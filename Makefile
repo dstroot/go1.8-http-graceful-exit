@@ -69,7 +69,7 @@ release:
 	# git
 	# git tag -a $(VERSION) -m "Release" || true
 	git tag -a v$(VERSION) -m "$(GIT_NAME)-v$(VERSION)"
-	git push origin $(VERSION)
+	git push origin v$(VERSION)
 	# docker
 	docker build -t $(GIT_NAME):latest .
 	docker tag $(GIT_NAME):latest $(GIT_NAME):$(VERSION)
