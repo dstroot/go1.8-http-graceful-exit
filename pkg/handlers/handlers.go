@@ -73,3 +73,20 @@ func Page(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 func Hello(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	fmt.Fprintf(w, "Hello, %s!\n", p.ByName("name"))
 }
+
+// NotFound handles 404 pages
+func NotFound(w http.ResponseWriter, r *http.Request) {
+	// page data to render page
+	data := map[string]interface{}{
+		"title": "404",
+		"Key":   "Value",
+		"Slice": []string{"One", "Two", "Three"},
+	}
+
+	// render page template
+	err := Render.RenderTemplate(w, "404.html", data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}

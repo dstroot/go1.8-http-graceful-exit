@@ -24,5 +24,8 @@ func New() *httprouter.Router {
 	// handler for serving static files
 	r.ServeFiles("/public/*filepath", http.Dir("public"))
 
+	// handle 404's gracefully
+	r.NotFound = http.HandlerFunc(handle.NotFound)
+
 	return r
 }

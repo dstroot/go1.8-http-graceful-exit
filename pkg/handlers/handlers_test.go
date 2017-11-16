@@ -111,6 +111,42 @@ func TestHello(t *testing.T) {
 	}
 }
 
+func TestNotFound(t *testing.T) {
+	// set template relative path
+	Render = tmpl.New(
+		tmpl.Options{
+			TemplateDirectory: "../../templates",
+		},
+	)
+
+	router := httprouter.New()
+	router.NotFound = http.HandlerFunc(NotFound)
+
+	req, _ := http.NewRequest("GET", "/404", nil)
+	rr := httptest.NewRecorder()
+
+	router.ServeHTTP(rr, req)
+
+	// Check the status code is what we expect.
+	if status := rr.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+
+	// Check content type
+	if ctype := rr.Header().Get("Content-Type"); ctype != "text/html; charset=utf-8" {
+		t.Errorf("content type header does not match: got %v want %v",
+			ctype, "text/html; charset=utf-8")
+	}
+
+	// Check the response body contains what we expect
+	expected := "Bootstrap &middot; 404"
+	if !strings.Contains(rr.Body.String(), expected) {
+		t.Errorf("handler returned unexpected body: got %v want %v",
+			rr.Body.String(), expected)
+	}
+}
+
 // func TestIndexHandler(t *testing.T) {
 // 	// Create a request to pass to our handler. We don't have any query parameters for now, so we'll
 // 	// pass 'nil' as the third parameter.
