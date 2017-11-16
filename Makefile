@@ -50,7 +50,7 @@ lint:
 # Create and run a docker image (assumes you have docker setup on your
 # dev machine)
 docker:
-	docker build -t $(GIT_NAME):latest . && docker run -d -p 80:8000 --name simple $(GIT_NAME):latest
+	docker build --no-cache -t $(GIT_NAME):latest . && docker run -d -p 80:8000 --name simple $(GIT_NAME):latest
 
 # This will create a tagged git release as well as a corresponding
 # tagged docker image. I really like publishing a Docker image together
@@ -62,7 +62,7 @@ release:
 	git tag -a v$(VERSION) -m "$(GIT_NAME)-v$(VERSION)"
 	git push origin v$(VERSION)
 	# docker
-	docker build -t $(GIT_NAME):latest .
+	docker build --no-cache -t $(GIT_NAME):latest .
 	docker tag $(GIT_NAME):latest $(GIT_NAME):$(VERSION)
 	docker push $(GIT_NAME):latest
 	docker push $(GIT_NAME):$(VERSION)

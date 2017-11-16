@@ -1,6 +1,7 @@
 // Package tmpl is a package that handles template rendering the way I like to do it.
 // There are others out there.  This one is pretty good:
-// https://github.com/thedevsaddam/renderer/blob/master/renderer.go
+// https://github.com/unrolled/render    Also see:
+// https://github.com/thedevsaddam/renderer
 // it also handles multiple types of rendering other than just templates.
 package tmpl
 
