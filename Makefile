@@ -1,10 +1,9 @@
-# I usually keep a `VERSION` file in the root so that anyone
-# can clearly check what's the VERSION of `master` or any
-# branch at any time by checking the `VERSION` in that git
-# revision
-VERSION         :=      $(shell cat ./VERSION)
-IMAGE_NAME      :=      dstroot/example
+#
+# Variables
+#
 
+VERSION=$(shell cat ./VERSION)
+GIT_NAME=dstroot/simple-go-webserver
 
 # Install all the build and lint dependencies
 setup:
@@ -57,9 +56,8 @@ lint:
 # because Docker makes it very simple to someone run your binary without
 # having to worry about the retrieval of the binary and execution of it
 # - docker already provides the necessary boundaries.
-image:
-	docker build -t cirocosta/l7 .
-
+docker:
+	docker build -t $(GIT_NAME):latest . && docker run -d -p 80:8000 --name simple $(GIT_NAME):latest
 
 # This is pretty much an optional thing that I tend to always include.
 # Goreleaser is a tool that allows anyone to integrate a binary releasing
@@ -68,9 +66,15 @@ image:
 # builds if you wish.
 # See more at `gorelease` github repo.
 release:
-	git tag -a $(VERSION) -m "Release" || true
+	# git
+	# git tag -a $(VERSION) -m "Release" || true
+	git tag -a v$(VERSION) -m "$(GIT_NAME)-v$(VERSION)"
 	git push origin $(VERSION)
-	goreleaser --rm-dist
+	# docker
+	docker build -t $(GIT_NAME):latest .
+	docker tag $(GIT_NAME):latest $(GIT_NAME):$(VERSION)
+	docker push $(GIT_NAME):latest
+	docker push $(GIT_NAME):$(VERSION)
 
 # Show any to-do items per file.
 todo:
@@ -109,3 +113,36 @@ docs:
 # targets that are often phony are: all, install, clean, distclean,
 # TAGS, info, check.
 .PHONY: install test cover todo fmt release run
+
+
+
+
+
+	#
+	# Variables
+	#
+
+	DOCKER_NAME=dstroot/tpg-tsweb
+	VERSION=1.0.7
+	SHELL=/bin/bash
+
+	#
+	# Build
+	#
+
+	all: $(info $(DOCKER_NAME) current version is $(VERSION)) build version push clean
+
+	build:
+		docker build -t $(DOCKER_NAME):latest .
+
+	version:
+		docker tag $(DOCKER_NAME):latest $(DOCKER_NAME):$(VERSION)
+		git tag -a v$(VERSION) -m "$(DOCKER_NAME)-v$(VERSION)"
+
+	push:
+		git push origin v$(VERSION)
+		docker push $(DOCKER_NAME):latest
+		docker push $(DOCKER_NAME):$(VERSION)
+
+	clean:
+		@echo "$(DOCKER_NAME) - v$(VERSION) completed"
