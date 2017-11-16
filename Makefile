@@ -48,7 +48,7 @@ lint:
 	@gometalinter --vendor ./...
 
 # Create and run a docker image (assumes you have docker setup on your
-# dev machine)
+# dev machine).  Use --no-cache option to force complete rebuild.
 docker:
 	docker build --no-cache -t $(GIT_NAME):latest . && docker run -d -p 80:8000 --name simple $(GIT_NAME):latest
 
