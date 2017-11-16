@@ -149,6 +149,9 @@ func (r *Render) RenderTemplate(w http.ResponseWriter, name string, data map[str
 
 	// Set the header and write the buffer to the http.ResponseWriter
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	buf.WriteTo(w)
+	_, err = buf.WriteTo(w)
+	if err != nil {
+		return err
+	}
 	return nil
 }

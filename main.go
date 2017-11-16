@@ -15,7 +15,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/dstroot/go1.8-http-graceful-exit/pkg/router"
+	"github.com/dstroot/simple-go-webserver/pkg/router"
 	"github.com/urfave/negroni"
 )
 
@@ -70,7 +70,6 @@ func main() {
 			// shut down gracefully, but wait no longer than 5 seconds before halting
 			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 			defer cancel()
-			s.Shutdown(ctx)
 			if err := s.Shutdown(ctx); err != nil {
 				log.Fatalf("Server could not shutdown: %v", err)
 			}

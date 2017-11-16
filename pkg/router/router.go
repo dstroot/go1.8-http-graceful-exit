@@ -4,7 +4,7 @@ import (
 	"expvar"
 	"net/http"
 
-	handle "github.com/dstroot/go1.8-http-graceful-exit/pkg/handlers"
+	handle "github.com/dstroot/simple-go-webserver/pkg/handlers"
 	"github.com/julienschmidt/httprouter"
 )
 

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/dstroot/go1.8-http-graceful-exit/pkg/tmpl"
+	"github.com/dstroot/simple-go-webserver/pkg/tmpl"
 	"github.com/julienschmidt/httprouter"
 )
 

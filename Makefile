@@ -5,19 +5,19 @@
 VERSION=$(shell cat ./VERSION)
 GIT_NAME=dstroot/simple-go-webserver
 
-# Install all the build and lint dependencies
-setup:
-	go get -u github.com/alecthomas/gometalinter
-	go get -u github.com/golang/dep/cmd/dep
-	go get -u golang.org/x/tools/cmd/cover
-	dep ensure
-	gometalinter --install
-
 # As a call to `make` without any arguments leads to the execution
 # of the first target found I really prefer to make sure that this
 # first one is a non-destructive one that does the most simple
 # desired installation. It's very common to people set it as `all`
-all: run
+all: $(info $(GIT_NAME) current version is => $(VERSION))
+
+# Install all the build and lint dependencies
+setup:
+	@go get -u github.com/alecthomas/gometalinter
+	@go get -u github.com/golang/dep/cmd/dep
+	@go get -u golang.org/x/tools/cmd/cover
+	@dep ensure
+	@gometalinter --install
 
 # NOTE: Add @ to the beginning of command to tell make not to print
 # the command being executed.
@@ -27,8 +27,8 @@ run:
 
 # Install just performs a normal `go install` which builds the source
 # files from the package at `./` (I like to keep a `main.go` in the root
-# that imports other subpackages). As I always commit `vendor` to `git`
-# a `go install` will typically always work - except if there's an OS
+# that imports other subpackages). After installing dependencies a
+# `go install` will typically always work - except if there's an OS
 # limitation in the build flags (e.g, a linux-only project).
 install:
 	@echo "Installing: $(VERSION)"
@@ -43,31 +43,22 @@ test:
 cover: test
 	@go tool cover -html=coverage.txt
 
-
 # Run all the linters
 lint:
 	@gometalinter --vendor ./...
 
-
-# This target is only useful if you plan to also create a Docker image at
-# the end. I have a separate `gist` with a sample Dockerfile tailored for
-# golang that you can check out at <TODO>.
-# I really like publishing a Docker image together with the GitHub release
-# because Docker makes it very simple to someone run your binary without
-# having to worry about the retrieval of the binary and execution of it
-# - docker already provides the necessary boundaries.
+# Create and run a docker image (assumes you have docker setup on your
+# dev machine)
 docker:
 	docker build -t $(GIT_NAME):latest . && docker run -d -p 80:8000 --name simple $(GIT_NAME):latest
 
-# This is pretty much an optional thing that I tend to always include.
-# Goreleaser is a tool that allows anyone to integrate a binary releasing
-# process to their pipelines. Here in this target With just a simple
-# `make release` you can have a `tag` created in GitHub with multiple
-# builds if you wish.
-# See more at `gorelease` github repo.
+# This will create a tagged git release as well as a corresponding
+# tagged docker image. I really like publishing a Docker image together
+# with the GitHub release because Docker makes it very simple to someone
+# run your binary without having to worry about the retrieval of the binary
+# and execution of it - docker already provides the necessary boundaries.
 release:
 	# git
-	# git tag -a $(VERSION) -m "Release" || true
 	git tag -a v$(VERSION) -m "$(GIT_NAME)-v$(VERSION)"
 	git push origin v$(VERSION)
 	# docker
@@ -113,36 +104,3 @@ docs:
 # targets that are often phony are: all, install, clean, distclean,
 # TAGS, info, check.
 .PHONY: install test cover todo fmt release run
-
-
-
-
-
-	#
-	# Variables
-	#
-
-	DOCKER_NAME=dstroot/tpg-tsweb
-	VERSION=1.0.7
-	SHELL=/bin/bash
-
-	#
-	# Build
-	#
-
-	all: $(info $(DOCKER_NAME) current version is $(VERSION)) build version push clean
-
-	build:
-		docker build -t $(DOCKER_NAME):latest .
-
-	version:
-		docker tag $(DOCKER_NAME):latest $(DOCKER_NAME):$(VERSION)
-		git tag -a v$(VERSION) -m "$(DOCKER_NAME)-v$(VERSION)"
-
-	push:
-		git push origin v$(VERSION)
-		docker push $(DOCKER_NAME):latest
-		docker push $(DOCKER_NAME):$(VERSION)
-
-	clean:
-		@echo "$(DOCKER_NAME) - v$(VERSION) completed"
