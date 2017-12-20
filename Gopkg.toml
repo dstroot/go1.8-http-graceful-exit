@@ -22,6 +22,10 @@
 
 
 [[constraint]]
+  name = "github.com/dstroot/utility"
+  version = "1.1.0"
+
+[[constraint]]
   name = "github.com/julienschmidt/httprouter"
   version = "1.1.0"
 
@@ -31,4 +35,4 @@
 
 [[constraint]]
   name = "github.com/urfave/negroni"
-  version = "0.2.0"
+  version = "0.3.0"

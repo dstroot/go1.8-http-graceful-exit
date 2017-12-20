@@ -2,6 +2,12 @@
 
 
 [[projects]]
+  name = "github.com/dstroot/utility"
+  packages = ["."]
+  revision = "b6cfa7ea2be4ab89e0c4489a49469888997655f6"
+  version = "v1.1"
+
+[[projects]]
   name = "github.com/julienschmidt/httprouter"
   packages = ["."]
   revision = "8c199fb6259ffc1af525cc3ad52ee60ba8359669"
@@ -16,12 +22,12 @@
 [[projects]]
   name = "github.com/urfave/negroni"
   packages = ["."]
-  revision = "fde5e16d32adc7ad637e9cd9ad21d4ebc6192535"
-  version = "v0.2.0"
+  revision = "5dbbc83f748fc3ad38585842b0aedab546d0ea1e"
+  version = "v0.3.0"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "24f104284735a8d7439c10ba8416448f599959effacdd91867a6d49ba5640c87"
+  inputs-digest = "1a9f5a3d69b6767ab1083b79600aeccb7d918a057354b17e42a702a53e91fd57"
   solver-name = "gps-cdcl"
   solver-version = 1

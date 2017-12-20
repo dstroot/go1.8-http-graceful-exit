@@ -43,3 +43,4 @@ The repo is structured as follows:
 * [Things to know about HTTP in Go](https://scene-si.org/2017/09/27/things-to-know-about-http-in-go/)
 * [What's Coming in Go 1.8](https://tylerchr.blog/golang-18-whats-coming/)
 * [So you want to expose Go on the Internet](https://blog.gopheracademy.com/advent-2016/exposing-go-on-the-internet/)
+* [Running Go programs on Kubernetes](https://blog.gopheracademy.com/advent-2017/kubernetes-ready-service/)

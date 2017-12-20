@@ -29,7 +29,7 @@ func TestRoutes(t *testing.T) {
 		{"GET", "/page", http.StatusOK},
 		{"GET", "/hello/Dan", http.StatusOK},
 		{"GET", "/debug/vars", http.StatusOK},
-		{"GET", "/nonexistant", http.StatusNotFound},
+		{"GET", "/nonexistant", http.StatusOK},
 	}
 
 	// instantiate a router
