@@ -1,8 +1,6 @@
 // This is an example of a simple webserver with a graceful
-// shutdown. It is now possible to call srv.Close() to halt an
-// http.Server immediately, or srv.Shutdown(ctx) to stop
-// and gracefully drain the server of connections. We are using
-// httprouter and negroni also.
+// shutdown. We are using httprouter for routing and negroni
+// for middleware.
 package main
 
 import (
