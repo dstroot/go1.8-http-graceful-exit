@@ -2,10 +2,22 @@
 
 
 [[projects]]
+  branch = "master"
+  name = "github.com/beorn7/perks"
+  packages = ["quantile"]
+  revision = "4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9"
+
+[[projects]]
   name = "github.com/dstroot/utility"
   packages = ["."]
   revision = "b6cfa7ea2be4ab89e0c4489a49469888997655f6"
   version = "v1.1"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/golang/protobuf"
+  packages = ["proto"]
+  revision = "1e59b77b52bf8e4b449a57e6f79f21226d571845"
 
 [[projects]]
   name = "github.com/julienschmidt/httprouter"
@@ -14,10 +26,40 @@
   version = "v1.1"
 
 [[projects]]
+  name = "github.com/matttproud/golang_protobuf_extensions"
+  packages = ["pbutil"]
+  revision = "3247c84500bff8d9fb6d579d800f20b3e091582c"
+  version = "v1.0.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/oxtoacart/bpool"
   packages = ["."]
   revision = "4e1c5567d7c2dd59fa4c7c83d34c2f3528b025d6"
+
+[[projects]]
+  name = "github.com/prometheus/client_golang"
+  packages = ["prometheus"]
+  revision = "c5b7fccd204277076155f10851dad72b76a49317"
+  version = "v0.8.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/prometheus/client_model"
+  packages = ["go"]
+  revision = "99fa1f4be8e564e8a6b613da7fa6f46c9edafc6c"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/prometheus/common"
+  packages = ["expfmt","internal/bitbucket.org/ww/goautoneg","model"]
+  revision = "2e54d0b93cba2fd133edc32211dcc32c06ef72ca"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/prometheus/procfs"
+  packages = [".","xfs"]
+  revision = "f98634e408857669d61064b283c4cde240622865"
 
 [[projects]]
   name = "github.com/urfave/negroni"
@@ -28,6 +70,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "1a9f5a3d69b6767ab1083b79600aeccb7d918a057354b17e42a702a53e91fd57"
+  inputs-digest = "640fafe1d2e330bbecbe328f5f9a71829a651f3e6ecb1ca537e3653b9cd43fea"
   solver-name = "gps-cdcl"
   solver-version = 1

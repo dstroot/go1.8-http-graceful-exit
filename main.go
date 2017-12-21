@@ -6,6 +6,8 @@
 package main
 
 import (
+	"github.com/dstroot/simple-go-webserver/pkg/info"
+	"github.com/dstroot/simple-go-webserver/pkg/metrics"
 	"github.com/dstroot/simple-go-webserver/pkg/router"
 	"github.com/urfave/negroni"
 )
@@ -17,6 +19,7 @@ func main() {
 	// Negroni Middleware Stack
 	n := negroni.New()
 	n.Use(negroni.NewRecovery())
+	n.Use(metrics.NewMiddleware(info.Report.Program))
 	n.Use(negroni.NewLogger())
 	n.UseHandler(r) // pass router to negroni
 

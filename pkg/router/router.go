@@ -4,10 +4,13 @@ import (
 	"expvar"
 	"log"
 	"net/http"
+	"sync/atomic"
 
 	handle "github.com/dstroot/simple-go-webserver/pkg/handlers"
+	"github.com/dstroot/simple-go-webserver/pkg/health"
 	"github.com/dstroot/simple-go-webserver/pkg/info"
 	"github.com/julienschmidt/httprouter"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 // New creates a new router with our routes
@@ -30,6 +33,16 @@ func New() *httprouter.Router {
 
 	// handler for serving info
 	r.Handler("GET", "/info", info.HandlerFunc())
+
+	// Prometheus metrics
+	r.Handler("GET", "/metrics", prometheus.Handler())
+
+	// health and readiness
+	r.Handler("GET", "/healthz", health.HandlerFunc())
+
+	isReady := &atomic.Value{}
+	isReady.Store(true)
+	r.Handler("GET", "/readyz", health.ReadyFunc(isReady))
 
 	// handler for serving static files
 	r.ServeFiles("/public/*filepath", http.Dir("public"))
