@@ -1,3 +1,7 @@
+/*
+Package handlers implements a library for our application's
+HTTP handlers.  These will be used by our router package.
+*/
 package handlers
 
 import (

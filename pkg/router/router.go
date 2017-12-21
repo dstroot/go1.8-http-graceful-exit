@@ -1,3 +1,6 @@
+/*
+Package router implements a library to manage our application's routes.
+*/
 package router
 
 import (
@@ -23,7 +26,7 @@ func New() *httprouter.Router {
 		log.Fatalf("info could not be initialized")
 	}
 
-	// Routes
+	// application routes
 	r.GET("/", handle.Index)
 	r.GET("/page", handle.Page)
 	r.GET("/hello/:name", handle.Hello)
@@ -37,9 +40,14 @@ func New() *httprouter.Router {
 	// Prometheus metrics
 	r.Handler("GET", "/metrics", prometheus.Handler())
 
-	// health and readiness
+	// healthz (for Kubernetes)
 	r.Handler("GET", "/healthz", health.HandlerFunc())
 
+	// healthz (for Kubernetes).
+	// For the readiness probe we might need to wait for some event
+	// (e.g. the database is ready) to be able to serve traffic. We
+	// return 200 only if the variable "isReady" is true.
+	// Here we simply set isReady to true.
 	isReady := &atomic.Value{}
 	isReady.Store(true)
 	r.Handler("GET", "/readyz", health.ReadyFunc(isReady))

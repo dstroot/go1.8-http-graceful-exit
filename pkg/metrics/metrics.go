@@ -1,6 +1,29 @@
-// It is best practice to provide an endpoint for instrumentation tools
-// (like prometheus). Use this middleware like the negroni.Logger
-// middleware (after negroni.Recovery, before every other middleware).
+/*
+Package metrics implements a library to expose Prometheus metrics.
+It is best practice to provide an endpoint for instrumentation tools
+(like prometheus). It is implemented as Negroni middleware.  Use this
+middleware like the negroni.Loggermiddleware (after negroni.Recovery,
+before every other middleware).
+
+You also need to implement a corresponding route to expose the metrics:
+
+	import (
+		"github.com/julienschmidt/httprouter"
+		"github.com/prometheus/client_golang/prometheus"
+	)
+
+	// New creates a new router with our routes included
+	func New() *httprouter.Router {
+
+		r := httprouter.New()
+
+		// Prometheus metrics
+		r.Handler("GET", "/metrics", prometheus.Handler())
+
+		return r
+	}
+
+*/
 package metrics
 
 import (
@@ -27,7 +50,7 @@ type Middleware struct {
 	latency *prometheus.HistogramVec
 }
 
-// NewMiddleware returns a new prometheus Middleware handler.
+// NewMiddleware returns a new instance of prometheus middleware for Negroni.
 func NewMiddleware(name string, buckets ...float64) *Middleware {
 	var m Middleware
 	m.reqs = prometheus.NewCounterVec(
@@ -55,6 +78,7 @@ func NewMiddleware(name string, buckets ...float64) *Middleware {
 	return &m
 }
 
+// ServeHTTP method captures the metrics are interested in...
 func (m *Middleware) ServeHTTP(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	start := time.Now()
 	next(rw, r)

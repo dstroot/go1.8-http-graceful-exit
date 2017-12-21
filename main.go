@@ -4,10 +4,16 @@
 package main
 
 import (
+	"os"
+
 	"github.com/dstroot/simple-go-webserver/pkg/info"
 	"github.com/dstroot/simple-go-webserver/pkg/metrics"
 	"github.com/dstroot/simple-go-webserver/pkg/router"
 	"github.com/urfave/negroni"
+)
+
+var (
+	port = os.Getenv("PORT")
 )
 
 func main() {
@@ -22,6 +28,9 @@ func main() {
 	n.UseHandler(r) // pass router to negroni
 
 	// Create and run server
-	s := NewServer(":8000", n) // pass port and negroni
+	if port == "" {
+		port = "8000"
+	}
+	s := NewServer(port, n) // pass port and negroni
 	s.Run()
 }

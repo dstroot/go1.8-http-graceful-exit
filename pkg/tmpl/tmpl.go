@@ -1,8 +1,10 @@
-// Package tmpl is a package that handles template rendering the way I like to do it.
-// There are others out there.  This one is pretty good:
-// https://github.com/unrolled/render    Also see:
-// https://github.com/thedevsaddam/renderer
-// it also handles multiple types of rendering other than just templates.
+/*
+Package tmpl is a package that handles template rendering.
+
+There are others out there.
+This one is pretty good: https://github.com/unrolled/render
+Also see: https://github.com/thedevsaddam/renderer
+*/
 package tmpl
 
 import (

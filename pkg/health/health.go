@@ -1,3 +1,8 @@
+/*
+Package health implements a library that defines health and
+readiness HTTP handlers.  These will be used by our router package
+to expose '/healthz' and '/readyz' endpoints for Kubernetes.
+*/
 package health
 
 import (

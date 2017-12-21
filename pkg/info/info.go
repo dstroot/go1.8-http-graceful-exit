@@ -1,3 +1,7 @@
+/*
+Package info implements a library to expose information about our application.
+It will be used by our router package to expose an '/info' endpoint
+*/
 package info
 
 import (

@@ -20,7 +20,7 @@ type Server struct {
 func NewServer(hostPort string, h http.Handler) *Server {
 	return &Server{
 		server: &http.Server{
-			Addr:           hostPort,
+			Addr:           ":" + hostPort,
 			Handler:        h, // pass in negroni or other mux/router
 			ReadTimeout:    5 * time.Second,
 			WriteTimeout:   10 * time.Second,
