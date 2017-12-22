@@ -53,6 +53,7 @@ type Middleware struct {
 // NewMiddleware returns a new instance of prometheus middleware for Negroni.
 func NewMiddleware(name string, buckets ...float64) *Middleware {
 	var m Middleware
+
 	m.reqs = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name:        reqsName,
@@ -75,14 +76,18 @@ func NewMiddleware(name string, buckets ...float64) *Middleware {
 		[]string{"code", "method", "path"},
 	)
 	prometheus.MustRegister(m.latency)
+
 	return &m
 }
 
 // ServeHTTP method captures the metrics are interested in...
 func (m *Middleware) ServeHTTP(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	start := time.Now()
+
 	next(rw, r)
-	res := negroni.NewResponseWriter(rw)
-	m.reqs.WithLabelValues(http.StatusText(res.Status()), r.Method, r.URL.Path).Inc()
-	m.latency.WithLabelValues(http.StatusText(res.Status()), r.Method, r.URL.Path).Observe(float64(time.Since(start).Nanoseconds()) / 1000000)
+	res := rw.(negroni.ResponseWriter)
+
+	code := http.StatusText(res.Status())
+	m.reqs.WithLabelValues(code, r.Method, r.URL.Path).Inc()
+	m.latency.WithLabelValues(code, r.Method, r.URL.Path).Observe(float64(time.Since(start).Nanoseconds()) / 1000000)
 }
