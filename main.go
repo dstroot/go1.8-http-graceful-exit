@@ -4,6 +4,7 @@
 package main
 
 import (
+	"log"
 	"os"
 
 	"github.com/dstroot/simple-go-webserver/pkg/info"
@@ -32,5 +33,8 @@ func main() {
 		port = "8000"
 	}
 	s := NewServer(port, n) // pass port and mux
-	s.Run()
+	err := s.Run()
+	if err != nil {
+		log.Fatal(err)
+	}
 }

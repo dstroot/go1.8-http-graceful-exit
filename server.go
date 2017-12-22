@@ -9,6 +9,9 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
+	// https://dave.cheney.net/2016/04/27/dont-just-check-errors-handle-them-gracefully
+	"github.com/pkg/errors"
 )
 
 // Server implements our HTTP server
@@ -34,7 +37,10 @@ func NewServer(hostPort string, h http.Handler) *Server {
 func (s *Server) Run() error {
 
 	// Get hostname
-	hostname, _ := os.Hostname()
+	hostname, err := os.Hostname()
+	if err != nil {
+		return errors.Wrap(err, "hostname unavailable")
+	}
 
 	// Error handling
 	errChan := make(chan error, 10)
@@ -54,7 +60,8 @@ func (s *Server) Run() error {
 		select {
 		case err := <-errChan:
 			if err != http.ErrServerClosed { // Go ver >1.8
-				log.Fatalf("listen: %s\n", err)
+				// log.Fatalf("listen: %s\n", err)
+				return errors.Wrap(err, "server not closed")
 			}
 		case <-sigs:
 			fmt.Println("")
@@ -63,11 +70,11 @@ func (s *Server) Run() error {
 			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 			defer cancel()
 			if err := s.server.Shutdown(ctx); err != nil {
-				log.Fatalf("Server could not shutdown: %v", err)
+				// log.Fatalf("Server could not shutdown: %v", err)
+				return errors.Wrap(err, "server could not shutdown")
 			}
 			log.Printf("%s - Server gracefully stopped.\n", hostname)
 			os.Exit(0)
 		}
 	}
-
 }
