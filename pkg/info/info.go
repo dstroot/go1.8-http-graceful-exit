@@ -44,12 +44,6 @@ type Metrics struct {
 
 // Init initializes our metrics.
 func Init() (err error) {
-	path := strings.Split(os.Args[0], "/")
-	Report.Program = strings.Title(path[len(path)-1])
-	Report.BuildTime = BuildTime
-	Report.Commit = Commit
-	Report.Version = Version
-	Report.GoVersion = runtime.Version()
 
 	// get hostname
 	Report.HostName, err = os.Hostname()
@@ -62,6 +56,19 @@ func Init() (err error) {
 	if err != nil {
 		return err
 	}
+
+	// get port
+	Report.Port = os.Getenv("PORT")
+	if Report.Port == "" {
+		Report.Port = "8000"
+	}
+
+	path := strings.Split(os.Args[0], "/")
+	Report.Program = strings.Title(path[len(path)-1])
+	Report.BuildTime = BuildTime
+	Report.Commit = Commit
+	Report.Version = Version
+	Report.GoVersion = runtime.Version()
 
 	return nil
 }
