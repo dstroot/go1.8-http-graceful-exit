@@ -17,7 +17,7 @@ var (
 )
 
 func main() {
-	// HTTP router
+	// HTTP router (a mux)
 	r := router.New()
 
 	// Negroni Middleware Stack
@@ -25,12 +25,12 @@ func main() {
 	n.Use(negroni.NewRecovery())
 	n.Use(metrics.NewMiddleware(info.Report.Program))
 	n.Use(negroni.NewLogger())
-	n.UseHandler(r) // pass router to negroni
+	n.UseHandler(r) // pass mux to negroni
 
 	// Create and run server
 	if port == "" {
 		port = "8000"
 	}
-	s := NewServer(port, n) // pass port and negroni
+	s := NewServer(port, n) // pass port and mux
 	s.Run()
 }
