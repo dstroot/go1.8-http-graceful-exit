@@ -50,8 +50,8 @@ type Middleware struct {
 	latency *prometheus.HistogramVec
 }
 
-// NewMiddleware returns a new instance of prometheus middleware for Negroni.
-func NewMiddleware(name string, buckets ...float64) *Middleware {
+// NewMetrics returns a new instance of prometheus middleware for Negroni.
+func NewMetrics(name string, buckets ...float64) *Middleware {
 	var m Middleware
 
 	m.reqs = prometheus.NewCounterVec(
