@@ -12,7 +12,7 @@ import (
 )
 
 // Handler supports a liveness probe. It is a simple handler which
-// always return response code 200
+// always returns response code 200 and {"alive": true}
 func Handler(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
