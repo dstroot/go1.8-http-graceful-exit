@@ -19,7 +19,7 @@ func main() {
 	// Negroni Middleware Stack
 	n := negroni.New()
 	n.Use(negroni.NewRecovery())
-	n.Use(metrics.NewMetrics(info.Report.Program))
+	n.Use(metrics.NewMetrics(info.Report.HostName, info.Report.Program, 1, 3, 10))
 	n.Use(negroni.NewLogger())
 	n.UseHandler(r) // pass mux to negroni
 

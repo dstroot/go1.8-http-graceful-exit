@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/dstroot/utility"
+	"github.com/pkg/errors"
 )
 
 var (
@@ -39,22 +40,25 @@ type Metrics struct {
 	Commit    string
 	Version   string
 	GoVersion string
+	PID       int
 	RunTime   string
 }
 
 // Init initializes our metrics.
 func Init() (err error) {
 
+	Report.PID = os.Getpid()
+
 	// get hostname
 	Report.HostName, err = os.Hostname()
 	if err != nil {
-		return err
+		return errors.Wrap(err, "hostname unavailable")
 	}
 
 	// get IP address
 	Report.IPAddress, err = utility.GetLocalIP()
 	if err != nil {
-		return err
+		return errors.Wrap(err, "IP unavailable")
 	}
 
 	// get port

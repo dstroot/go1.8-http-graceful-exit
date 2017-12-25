@@ -32,10 +32,21 @@ spec:
             port: 8000
           initialDelaySeconds: 5
         resources:
-          limits:
-            cpu: 10m
-            memory: 30Mi
           requests:
-            cpu: 10m
-            memory: 30Mi
-      terminationGracePeriodSeconds: 30
+            cpu: 250m
+            memory: 128Mi # 128 MiB
+          limits:
+            cpu: 500m
+            memory: 256Mi
+      terminationGracePeriodSeconds: 5
+# Limits and requests for CPU resources are measured in cpu units. One cpu,
+# in Kubernetes, is equivalent to:
+#  - 1 AWS vCPU
+#  - 1 GCP Core
+#  - 1 Azure vCore
+#  - 1 Hyperthread on a bare-metal Intel processor with Hyperthreading
+
+# Fractional requests are allowed. The expression 0.1 is equivalent to
+# the expression 100m, which can be read as “one hundred millicpu”.
+# Some people say “one hundred millicores”, and this is understood to
+# mean the same thing.

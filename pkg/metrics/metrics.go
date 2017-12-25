@@ -26,6 +26,11 @@ You also need to implement a corresponding route to expose the metrics:
 */
 package metrics
 
+// have a look at this package as well:
+// https://github.com/thoas/stats/blob/master/stats.go
+// It seems to take ideas from negroni as well as adapt to
+// other middleware.
+
 import (
 	"net/http"
 	"time"
@@ -40,7 +45,9 @@ var (
 
 const (
 	reqsName    = "requests_total"
+	reqsHelp    = "HTTP requests processed, partitioned by status code, method and HTTP path."
 	latencyName = "request_duration_milliseconds"
+	latencyHelp = "How long it took to process the request, partitioned by status code, method and HTTP path."
 )
 
 // Middleware is a handler that exposes prometheus metrics for the number of requests,
@@ -51,26 +58,27 @@ type Middleware struct {
 }
 
 // NewMetrics returns a new instance of prometheus middleware for Negroni.
-func NewMetrics(name string, buckets ...float64) *Middleware {
+func NewMetrics(host string, service string, buckets ...float64) *Middleware {
 	var m Middleware
 
-	m.reqs = prometheus.NewCounterVec(
-		prometheus.CounterOpts{
-			Name:        reqsName,
-			Help:        "HTTP requests processed, partitioned by status code, method and HTTP path.",
-			ConstLabels: prometheus.Labels{"service": name},
-		},
+	// requests
+	m.reqs = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Name:        reqsName,
+		Help:        reqsHelp,
+		ConstLabels: prometheus.Labels{"host": host, "service": service},
+	},
 		[]string{"code", "method", "path"},
 	)
 	prometheus.MustRegister(m.reqs)
 
+	// latency
 	if len(buckets) == 0 {
 		buckets = dflBuckets
 	}
 	m.latency = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Name:        latencyName,
-		Help:        "How long it took to process the request, partitioned by status code, method and HTTP path.",
-		ConstLabels: prometheus.Labels{"service": name},
+		Help:        latencyHelp,
+		ConstLabels: prometheus.Labels{"host": host, "service": service},
 		Buckets:     buckets,
 	},
 		[]string{"code", "method", "path"},
@@ -85,9 +93,27 @@ func (m *Middleware) ServeHTTP(rw http.ResponseWriter, r *http.Request, next htt
 	start := time.Now()
 
 	next(rw, r)
-	res := rw.(negroni.ResponseWriter)
+	res := negroni.NewResponseWriter(rw)
 
-	code := http.StatusText(res.Status())
-	m.reqs.WithLabelValues(code, r.Method, r.URL.Path).Inc()
-	m.latency.WithLabelValues(code, r.Method, r.URL.Path).Observe(float64(time.Since(start).Nanoseconds()) / 1000000)
+	// TODO I cant seem to get the actual status - it seems the response hasn't
+	// been actually written yet when we gte the code. Somehow we have to wait
+	// until the respnse is done. How does logger do it?
+	code := res.Status()
+	if code == 0 {
+		code = 200
+	}
+	status := http.StatusText(code)
+
+	// capture metrics
+	m.reqs.WithLabelValues(status, r.Method, r.URL.Path).Inc()
+	m.latency.WithLabelValues(status, r.Method, r.URL.Path).Observe(float64(time.Since(start).Nanoseconds()) / 1000000)
+
+	// defer func(start time.Time) { // Make sure we record a status.
+	// 	duration := time.Since(start)
+	// 	status := http.StatusText(res.Status())
+	//
+	// 	// capture metrics
+	// 	m.reqs.WithLabelValues(status, r.Method, r.URL.Path).Inc()
+	// 	m.latency.WithLabelValues(status, r.Method, r.URL.Path).Observe(duration.Seconds())
+	// }(time.Now())
 }

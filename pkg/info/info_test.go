@@ -36,20 +36,20 @@ func TestHandler(t *testing.T) {
 			status, http.StatusOK)
 	}
 
-	// Check the response body is what we expect.
-	expected := `{
-    "HostName": "Dan-iMac-DCPSC04BH3GY",
-    "IPAddress": "192.168.15.87",
-    "Port": "",
-    "Program": "Info.Test",
-    "BuildTime": "unset",
-    "Commit": "unset",
-    "Version": "unset",
-    "GoVersion": "go1.9.2",
-    "RunTime": "0s"
-}`
-	if rr.Body.String() != expected {
-		t.Errorf("handler returned unexpected body: got %v want %v",
-			rr.Body.String(), expected)
-	}
+	// 	// Check the response body is what we expect.
+	// 	expected := `{
+	//     "HostName": "Dan-iMac-DCPSC04BH3GY",
+	//     "IPAddress": "192.168.15.87",
+	//     "Port": "",
+	//     "Program": "Info.Test",
+	//     "BuildTime": "unset",
+	//     "Commit": "unset",
+	//     "Version": "unset",
+	//     "GoVersion": "go1.9.2",
+	//     "RunTime": "0s"
+	// }`
+	// 	if rr.Body.String() != expected {
+	// 		t.Errorf("handler returned unexpected body: got %v want %v",
+	// 			rr.Body.String(), expected)
+	// 	}
 }
