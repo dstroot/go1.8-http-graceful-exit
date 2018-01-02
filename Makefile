@@ -10,7 +10,7 @@
 
 # NOTE: I am not a fan of versions - people frequently forget to increment them.
 # The commit ID and the buid time are more precise and automatic. However
-# versions can be useful for humans so I still keep a `VERSION` file in the
+# versions can be useful for humans, so I still keep a `VERSION` file in the
 # root so that anyone can clearly check the VERSION of `master`.
 
 OWNER := dstroot
@@ -24,6 +24,11 @@ BUILD_TIME := $(shell date -u '+%Y-%m-%d_%H:%M:%S')
 COMMIT_ID := $(shell git rev-parse --short HEAD 2>/dev/null || echo nosha)
 VERSION := $(shell cat ./VERSION)
 
+GITUNTRACKEDCHANGES := $(shell git status --porcelain --untracked-files=no)
+ifneq ($(GITUNTRACKEDCHANGES),)
+	COMMIT_ID := $(COMMIT_ID)-dirty
+endif
+
 RELEASE_DIR := dist
 GOARCH := amd64
 GOOS := linux
@@ -36,23 +41,10 @@ PORT := 8000
 
 
 .PHONY: help
-default help:
-	@echo "Usage: make <command>\n"
-	@echo "The commands are:"
-	@echo "   all         Alias for 'run' command."
-	@echo "   gettools    Download and install Go-based build toolchain (uses go-get)."
-	@echo "   clean       Clean out old builds."
-	@echo "   build       Build a development version of the server. Runs dependent rules."
-	@echo "   run         Run development version of the application."
-	@echo "   test        Execute all development tests."
-	@echo "   cover       Examine code test coverage."
-	@echo "   lint        Run gometalinter against the source."
-	@echo "   release     Build production release(s). Runs dependent rules."
-	@echo "   docker      Build and run a local docker image."
-	@echo "   dockerpush  Push the a docker image to Docker Hub."
-	@echo "   minikube    Deploy the container on Kubernetes locally."
-	@echo "   todo        Display all TODO's in the source."
-	@echo "   docs        Display the application documentation.\n"
+help: ## Display help.
+	@echo "Usage: make <command> \n"
+	@echo "Commands:"
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "    \033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 
 #
@@ -61,13 +53,13 @@ default help:
 
 
 .PHONY: all
-all: $(info Current version is $(VERSION)) run
+all: $(info Current version is $(VERSION)-$(COMMIT_ID)) clean build run ## Runs "clean", "build", and "run".
 
 # NOTE: Add @ to the beginning of a command to tell make not to print
 # the command being executed.'
 
 .PHONY: gettools
-gettools:
+gettools: ## Download and install Go-based build toolchain (uses go-get).
 	@go get -u github.com/alecthomas/gometalinter
 	@go get -u github.com/golang/dep/cmd/dep
 	@go get -u golang.org/x/tools/cmd/cover
@@ -75,27 +67,28 @@ gettools:
 	@gometalinter --install
 
 .PHONY: clean
-clean:
-	@rm -f ${NAME}
+clean: ## Cleanup any build binaries or packages.
+	@echo "+ $@"
+	@$(RM) $(NAME)
 	@if [ -d ${RELEASE_DIR} ]; then \
-        rm -rf ${RELEASE_DIR}; \
-    fi
+		$(RM) -r ${RELEASE_DIR}; \
+	fi
 
 .PHONY: build
-build: clean
-	@echo "Building: $(VERSION)"
-	@echo "Project: $(PROJECT)"
-	@echo "Name: $(NAME)"
+build: $(NAME) ## Builds a dynamic executable or package.
 
+$(NAME): *.go VERSION
+	@echo "+ build $@ v$(VERSION)"
 	@go build \
 		-ldflags "-s -w \
 		-X ${PROJECT}/pkg/info.Version=${VERSION} \
 		-X ${PROJECT}/pkg/info.Commit=${COMMIT_ID} \
 		-X ${PROJECT}/pkg/info.BuildTime=${BUILD_TIME}" \
-		-o ${NAME}
+		-o $(NAME) .
 
 .PHONY: run
-run: build
+run: build ## Run the project executable.
+	@echo "+ $@"
 	@export PORT=$(PORT) && ./${NAME}
 
 
@@ -104,19 +97,19 @@ run: build
 #
 
 
-# Go test cover with multiple packages support
 .PHONY: test
-test:
+test: ## Run the go tests, including /pkg tests.
+	@echo "+ $@"
 	@echo 'mode: atomic' > coverage.txt && go list ./... | xargs -n1 -I{} sh -c 'go test -covermode=atomic -coverprofile=coverage.tmp {} && tail -n +2 coverage.tmp >> coverage.txt' && rm coverage.tmp
 
-# Get code coverage report
 .PHONY: cover
-cover: test
+cover: test ## Get code coverage report.
+	@echo "+ $@"
 	@go tool cover -html=coverage.txt
 
-# Lint all the things
 .PHONY: lint
-lint:
+lint: ## Lint all the things.
+	@echo "+ $@"
 	@gometalinter --vendor ./...
 
 
@@ -125,23 +118,34 @@ lint:
 #
 
 
-# Build a Linux production executable and pack it. Since we are using a packed
-# binary and Docker's scratch image we have a tiny docker container (~2mb!)
 .PHONY: release
-release: clean
+release: $(RELEASE_DIR) ## Build a Linux production executable and pack it.
+
+$(RELEASE_DIR): *.go VERSION
+	@echo "+ release $@"
+
 	@echo "Releasing: $(VERSION)"
+	@echo "Project: $(PROJECT)"
+	@echo "Name: $(NAME)"
+
 	@CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build \
+		-a -tags "static_build netgo" \
 		-ldflags "-s -w \
 		-X ${PROJECT}/pkg/info.Version=${VERSION} \
 		-X ${PROJECT}/pkg/info.Commit=${COMMIT_ID} \
-		-X ${PROJECT}/pkg/info.BuildTime=${BUILD_TIME}" \
-		-o ${RELEASE_DIR}/app
+		-X ${PROJECT}/pkg/info.BuildTime=${BUILD_TIME} \
+		-extldflags -static" \
+		-o ${RELEASE_DIR}/app .
 
 	@upx --force ${RELEASE_DIR}/*
 
+	openssl md5 $(RELEASE_DIR)/app > $(RELEASE_DIR)/$(NAME)-$(VERSION).md5;
+	openssl sha256 $(RELEASE_DIR)/app > $(RELEASE_DIR)/$(NAME)-$(VERSION).sha256;
+
 .PHONY: push
-push: release
-	git tag -a $(VERSION) -m "Release" || true
+push: dockerpush ## Push new version tag to Github and push tagged Docker image.
+	@echo "+ $@"
+	git tag -sa $(VERSION) -m "$(VERSION)"
 	git push origin $(VERSION)
 
 
@@ -150,24 +154,23 @@ push: release
 #
 
 
-# Build a docker image (assumes you have docker setup on your
-# dev machine).  Use --no-cache option to force a complete rebuild.
+# Note: Use --no-cache option to force a complete rebuild.
 .PHONY: dockerbuild
-dockerbuild: release
+dockerbuild: release ## Build a Docker image (assumes you have docker installed).
+	@echo "+ $@"
 	@docker build --no-cache -t $(DOCKER_NAME):latest .
 
-# Run a docker image (assumes you have docker setup on your
-# dev machine).
 .PHONY: dockerrun
-dockerrun: dockerbuild
+dockerrun: dockerbuild ## Run docker image locally (assumes you have docker installed).
+	@echo "+ $@"
 	@docker stop $(DOCKER_NAME):latest || true && docker rm $(DOCKER_NAME):latest || true
 	docker run -d --name ${NAME} -p ${PORT}:${PORT} \
 		-e "PORT=${PORT}" \
 		$(DOCKER_NAME):latest
 
-# Push container to Docker Hub
 .PHONY: dockerpush
-dockerpush: dockerbuild
+dockerpush: dockerbuild ## Deploy the project to Docker Hub.
+	@echo "+ $@"
 	@docker tag $(DOCKER_NAME):latest $(DOCKER_NAME):$(VERSION)
 	@docker push $(DOCKER_NAME):latest
 	@docker push $(DOCKER_NAME):$(VERSION)
@@ -177,7 +180,9 @@ dockerpush: dockerbuild
 # Minikube (Kubernetes Test)
 #
 
-minikube:
+.PHONY: minikube
+minikube: ## Deploy the project to minikube.
+	@echo "+ $@"
 	for t in $(shell find ./kubernetes -type f -name "*.yaml"); do \
         cat $$t | \
         	gsed -E "s/\{\{(\s*)\.Release(\s*)\}\}/$(VERSION)/g" | \
@@ -192,10 +197,11 @@ minikube:
 #
 
 
-# Show any to-do items per file.
 .PHONY: todo
-todo:
+todo: ## Display any "TODOs" in the source code.
+	@echo "+ $@"
 	@grep \
+	--exclude-dir=public \
 	--exclude-dir=vendor \
 	--exclude-dir=node_modules \
 	--exclude=Makefile \
@@ -203,9 +209,9 @@ todo:
 	--color \
 	-nRo -E ' TODO.*|SkipNow|nolint:.*' .
 
-# Show documentation
 .PHONY: docs
-docs:
+docs: ## Display project docs.
+	@echo "+ $@"
 	@godoc $(shell PWD)
 
 
@@ -230,3 +236,5 @@ docs:
 # independent from the state of the file system. Some common make
 # targets that are often phony are: all, install, clean, distclean,
 # TAGS, info, check.
+#
+# https://github.com/jessfraz/weather/blob/master/Makefile

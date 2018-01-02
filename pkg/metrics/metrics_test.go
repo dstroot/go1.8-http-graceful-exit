@@ -7,7 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/prometheus/client_golang/prometheus"
+	// "github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/urfave/negroni"
 )
 
@@ -18,7 +19,7 @@ func TestLogger(t *testing.T) {
 	m := NewMetrics("test host", "test service")
 	n.Use(m)
 	r := http.NewServeMux()
-	r.Handle("/metrics", prometheus.Handler())
+	r.Handle("/metrics", promhttp.Handler())
 	r.HandleFunc(`/ok`, func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprintln(w, "ok")

@@ -40,7 +40,7 @@ import (
 )
 
 var (
-	dflBuckets = []float64{300, 1200, 5000}
+	dflBuckets = []float64{.25, .5, 1, 2.5, 5, 10}
 )
 
 const (
@@ -55,6 +55,7 @@ const (
 type Middleware struct {
 	reqs    *prometheus.CounterVec
 	latency *prometheus.HistogramVec
+	size    *prometheus.HistogramVec
 }
 
 // NewMetrics returns a new instance of prometheus middleware for Negroni.
@@ -62,11 +63,12 @@ func NewMetrics(host string, service string, buckets ...float64) *Middleware {
 	var m Middleware
 
 	// requests
-	m.reqs = prometheus.NewCounterVec(prometheus.CounterOpts{
-		Name:        reqsName,
-		Help:        reqsHelp,
-		ConstLabels: prometheus.Labels{"host": host, "service": service},
-	},
+	m.reqs = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Name:        reqsName,
+			Help:        reqsHelp,
+			ConstLabels: prometheus.Labels{"host": host, "service": service},
+		},
 		[]string{"code", "method", "path"},
 	)
 	prometheus.MustRegister(m.reqs)
@@ -75,15 +77,29 @@ func NewMetrics(host string, service string, buckets ...float64) *Middleware {
 	if len(buckets) == 0 {
 		buckets = dflBuckets
 	}
-	m.latency = prometheus.NewHistogramVec(prometheus.HistogramOpts{
-		Name:        latencyName,
-		Help:        latencyHelp,
-		ConstLabels: prometheus.Labels{"host": host, "service": service},
-		Buckets:     buckets,
-	},
+	m.latency = prometheus.NewHistogramVec(
+		prometheus.HistogramOpts{
+			Name:        latencyName,
+			Help:        latencyHelp,
+			ConstLabels: prometheus.Labels{"host": host, "service": service},
+			Buckets:     buckets,
+		},
 		[]string{"code", "method", "path"},
 	)
 	prometheus.MustRegister(m.latency)
+
+	// responseSize has no labels, making it a zero-dimensional
+	// ObserverVec.
+	m.size = prometheus.NewHistogramVec(
+		prometheus.HistogramOpts{
+			Name:        "response_size_bytes",
+			Help:        "A histogram of response sizes for requests.",
+			ConstLabels: prometheus.Labels{"host": host, "service": service},
+			Buckets:     []float64{200, 500, 900, 1500},
+		},
+		[]string{},
+	)
+	prometheus.MustRegister(m.size)
 
 	return &m
 }
@@ -107,6 +123,7 @@ func (m *Middleware) ServeHTTP(rw http.ResponseWriter, r *http.Request, next htt
 	// capture metrics
 	m.reqs.WithLabelValues(status, r.Method, r.URL.Path).Inc()
 	m.latency.WithLabelValues(status, r.Method, r.URL.Path).Observe(float64(time.Since(start).Nanoseconds()) / 1000000)
+	m.size.WithLabelValues().Observe(float64(res.Size()))
 
 	// defer func(start time.Time) { // Make sure we record a status.
 	// 	duration := time.Since(start)

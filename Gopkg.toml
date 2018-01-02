@@ -34,5 +34,13 @@
   name = "github.com/oxtoacart/bpool"
 
 [[constraint]]
+  name = "github.com/pkg/errors"
+  version = "0.8.0"
+
+[[constraint]]
+  name = "github.com/prometheus/client_golang"
+  version = "0.8.0"
+
+[[constraint]]
   name = "github.com/urfave/negroni"
   version = "0.3.0"

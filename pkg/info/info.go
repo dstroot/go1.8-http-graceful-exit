@@ -17,6 +17,10 @@ import (
 	"github.com/pkg/errors"
 )
 
+const (
+	DEFAULT_PORT = "8000"
+)
+
 var (
 	start = time.Now().UTC()
 
@@ -44,6 +48,14 @@ type Metrics struct {
 	RunTime   string
 }
 
+func getPort() string {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = DEFAULT_PORT
+	}
+	return port
+}
+
 // Init initializes our metrics.
 func Init() (err error) {
 
@@ -62,10 +74,7 @@ func Init() (err error) {
 	}
 
 	// get port
-	Report.Port = os.Getenv("PORT")
-	if Report.Port == "" {
-		Report.Port = "8000"
-	}
+	Report.Port = getPort()
 
 	path := strings.Split(os.Args[0], "/")
 	Report.Program = strings.Title(path[len(path)-1])

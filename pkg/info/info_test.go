@@ -7,6 +7,14 @@ import (
 	// . "github.com/smartystreets/goconvey/convey"
 )
 
+func TestGetPort(t *testing.T) {
+	// Check the port is what we expect.
+	if port := getPort(); port != DEFAULT_PORT {
+		t.Errorf("Wrong port: got %v want %v",
+			port, DEFAULT_PORT)
+	}
+}
+
 func TestInit(t *testing.T) {
 	err := Init()
 	if err != nil {

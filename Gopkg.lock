@@ -45,7 +45,7 @@
 
 [[projects]]
   name = "github.com/prometheus/client_golang"
-  packages = ["prometheus"]
+  packages = ["prometheus","prometheus/promhttp"]
   revision = "c5b7fccd204277076155f10851dad72b76a49317"
   version = "v0.8.0"
 
@@ -65,7 +65,7 @@
   branch = "master"
   name = "github.com/prometheus/procfs"
   packages = [".","xfs"]
-  revision = "f98634e408857669d61064b283c4cde240622865"
+  revision = "8f918ac9ab4be3a790338bda8624fec5d71260b3"
 
 [[projects]]
   name = "github.com/urfave/negroni"
@@ -76,6 +76,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "9b138d524177a33e94eb6f6f3683962ce0b33697b18606e7c2679f73fbbc8a35"
+  inputs-digest = "abf46690ae6cb76e665f352bf811a1efae1c6f78c99ae1002d79b3d6ffd808d6"
   solver-name = "gps-cdcl"
   solver-version = 1
