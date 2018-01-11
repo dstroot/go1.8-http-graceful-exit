@@ -9,7 +9,7 @@ You also need to implement a corresponding route to expose the metrics:
 
 	import (
 		"github.com/julienschmidt/httprouter"
-		"github.com/prometheus/client_golang/prometheus"
+		"github.com/prometheus/client_golang/prometheus/promhttp"
 	)
 
 	// New creates a new router with our routes included
@@ -18,7 +18,7 @@ You also need to implement a corresponding route to expose the metrics:
 		r := httprouter.New()
 
 		// Prometheus metrics
-		r.Handler("GET", "/metrics", prometheus.Handler())
+		r.Handler("GET", "/metrics", promhttp.Handler())
 
 		return r
 	}
@@ -32,6 +32,7 @@ package metrics
 // other middleware.
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -50,17 +51,16 @@ const (
 	latencyHelp = "How long it took to process the request, partitioned by status code, method and HTTP path."
 )
 
-// Middleware is a handler that exposes prometheus metrics for the number of requests,
-// the latency and the response size, partitioned by status code, method and HTTP path.
-type Middleware struct {
+// Metrics holds our prometheus metrics buckets
+type Metrics struct {
 	reqs    *prometheus.CounterVec
 	latency *prometheus.HistogramVec
 	size    *prometheus.HistogramVec
 }
 
 // NewMetrics returns a new instance of prometheus middleware for Negroni.
-func NewMetrics(host string, service string, buckets ...float64) *Middleware {
-	var m Middleware
+func NewMetrics(host string, service string, buckets ...float64) *Metrics {
+	var m Metrics
 
 	// requests
 	m.reqs = prometheus.NewCounterVec(
@@ -88,14 +88,13 @@ func NewMetrics(host string, service string, buckets ...float64) *Middleware {
 	)
 	prometheus.MustRegister(m.latency)
 
-	// responseSize has no labels, making it a zero-dimensional
-	// ObserverVec.
+	// responseSize has no labels, making it a zero-dimensional ObserverVec.
 	m.size = prometheus.NewHistogramVec(
 		prometheus.HistogramOpts{
 			Name:        "response_size_bytes",
 			Help:        "A histogram of response sizes for requests.",
 			ConstLabels: prometheus.Labels{"host": host, "service": service},
-			Buckets:     []float64{200, 500, 900, 1500},
+			Buckets:     []float64{1000, 5000, 10000, 500000},
 		},
 		[]string{},
 	)
@@ -104,33 +103,19 @@ func NewMetrics(host string, service string, buckets ...float64) *Middleware {
 	return &m
 }
 
-// ServeHTTP method captures the metrics are interested in...
-func (m *Middleware) ServeHTTP(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+// Negroni middleware
+func (m *Metrics) ServeHTTP(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	start := time.Now()
 
 	next(rw, r)
-	res := negroni.NewResponseWriter(rw)
 
-	// TODO I cant seem to get the actual status - it seems the response hasn't
-	// been actually written yet when we gte the code. Somehow we have to wait
-	// until the respnse is done. How does logger do it?
-	code := res.Status()
-	if code == 0 {
-		code = 200
-	}
-	status := http.StatusText(code)
+	res := rw.(negroni.ResponseWriter)
+	status := http.StatusText(res.Status())
 
-	// capture metrics
+	// captures metrics
 	m.reqs.WithLabelValues(status, r.Method, r.URL.Path).Inc()
 	m.latency.WithLabelValues(status, r.Method, r.URL.Path).Observe(float64(time.Since(start).Nanoseconds()) / 1000000)
 	m.size.WithLabelValues().Observe(float64(res.Size()))
 
-	// defer func(start time.Time) { // Make sure we record a status.
-	// 	duration := time.Since(start)
-	// 	status := http.StatusText(res.Status())
-	//
-	// 	// capture metrics
-	// 	m.reqs.WithLabelValues(status, r.Method, r.URL.Path).Inc()
-	// 	m.latency.WithLabelValues(status, r.Method, r.URL.Path).Observe(duration.Seconds())
-	// }(time.Now())
+	fmt.Println(res.Size())
 }

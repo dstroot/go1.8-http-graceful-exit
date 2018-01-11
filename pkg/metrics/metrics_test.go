@@ -18,6 +18,7 @@ func TestLogger(t *testing.T) {
 	n := negroni.New()
 	m := NewMetrics("test host", "test service")
 	n.Use(m)
+	// n.Use(negroni.Wrap(Capture(m)))
 	r := http.NewServeMux()
 	r.Handle("/metrics", promhttp.Handler())
 	r.HandleFunc(`/ok`, func(w http.ResponseWriter, r *http.Request) {

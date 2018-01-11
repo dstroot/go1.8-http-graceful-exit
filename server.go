@@ -14,6 +14,12 @@ import (
 	"github.com/pkg/errors"
 )
 
+const (
+	// NOTE: If you use docker, docker stop has a default timeout of 10 seconds,
+	// so the graceful timeout should be set to expire before then.
+	timeout = 5 * time.Second
+)
+
 // Server implements our HTTP server
 type Server struct {
 	server *http.Server
@@ -43,38 +49,48 @@ func (s *Server) Run() error {
 	}
 
 	// Error handling
-	errChan := make(chan error, 10)
+	listenErr := make(chan error, 1)
 
 	// Run server
 	go func() {
 		log.Printf("%s - Starting server on port %v", hostname, s.server.Addr)
-		errChan <- s.server.ListenAndServe()
+		listenErr <- s.server.ListenAndServe()
 	}()
 
 	// SIGINT/SIGTERM handling
-	sigs := make(chan os.Signal, 1)
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	osSignals := make(chan os.Signal, 1)
+	signal.Notify(osSignals, syscall.SIGINT, syscall.SIGTERM)
 
 	// Handle channels/graceful shutdown
 	for {
 		select {
-		case err := <-errChan:
-			if err != http.ErrServerClosed { // Go ver >1.8
-				// log.Fatalf("listen: %s\n", err)
-				return errors.Wrap(err, "server not closed")
-			}
-		case <-sigs:
+		// If server.ListenAndServe() cannot startup due to errors
+		// such as "port in use" it will return an error.
+		case err := <-listenErr:
+			return err
+		// handle termination signal
+		case <-osSignals:
 			fmt.Println("")
-			log.Printf("%s - Shutdown signal received, exiting...\n", hostname)
-			// shut down gracefully, but wait no longer than 5 seconds before halting
-			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			log.Printf("%s - Shutdown signal received.\n", hostname)
+
+			// Servers in the process of shutting down should disable KeepAlives.
+			s.server.SetKeepAlivesEnabled(false)
+
+			// Attempt the graceful shutdown by closing the listener
+			// and completing all inflight requests.
+			ctx, cancel := context.WithTimeout(context.Background(), timeout)
 			defer cancel()
 			if err := s.server.Shutdown(ctx); err != nil {
-				// log.Fatalf("Server could not shutdown: %v", err)
-				return errors.Wrap(err, "server could not shutdown")
+				return err
 			}
+
+			// return any errors from this channel other than "ServerClosed"
+			if err := <-listenErr; err != http.ErrServerClosed {
+				return err
+			}
+
 			log.Printf("%s - Server gracefully stopped.\n", hostname)
-			os.Exit(0)
+			return nil
 		}
 	}
 }
