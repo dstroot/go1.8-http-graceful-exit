@@ -48,7 +48,7 @@ func Index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	}
 
 	// render page template
-	err := Render.RenderTemplate(w, "index.html", data)
+	err := Render.Template(w, "index.html", data)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -66,7 +66,7 @@ func Page(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	}
 
 	// render page template
-	err := Render.RenderTemplate(w, "page.html", data)
+	err := Render.Template(w, "page.html", data)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -89,7 +89,7 @@ func NotFound(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// render page template
-	err := Render.RenderTemplate(w, "404.html", data)
+	err := Render.Template(w, "404.html", data)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

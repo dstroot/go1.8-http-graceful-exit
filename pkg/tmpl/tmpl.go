@@ -129,11 +129,11 @@ func (r *Render) parseTemplates() {
 	}
 }
 
-// RenderTemplate renders our template.
-// RenderTemplate is a wrapper around template.ExecuteTemplate.
+// Template renders our template.
+// Template is a wrapper around template.ExecuteTemplate.
 // It writes into a bytes.Buffer before writing to the http.ResponseWriter to catch
 // any errors resulting from populating the template.
-func (r *Render) RenderTemplate(w http.ResponseWriter, name string, data map[string]interface{}) error {
+func (r *Render) Template(w http.ResponseWriter, name string, data map[string]interface{}) error {
 	// Ensure the template exists in the map.
 	tmpl, ok := r.templates[name]
 	if !ok {

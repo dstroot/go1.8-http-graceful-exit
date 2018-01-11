@@ -109,7 +109,7 @@ func TestRenderTemplates(t *testing.T) {
 
 	// render page template
 	rr := httptest.NewRecorder()
-	err := render.RenderTemplate(rr, "page.html", data)
+	err := render.Template(rr, "page.html", data)
 	if err != nil {
 		t.Error("rendering error")
 	}
