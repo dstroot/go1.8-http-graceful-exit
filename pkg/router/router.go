@@ -13,8 +13,6 @@ import (
 	"github.com/dstroot/simple-go-webserver/pkg/health"
 	"github.com/dstroot/simple-go-webserver/pkg/info"
 	"github.com/julienschmidt/httprouter"
-	// "github.com/prometheus/client_golang/prometheus"
-
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
@@ -22,7 +20,6 @@ import (
 func New() *httprouter.Router {
 
 	r := httprouter.New()
-	// m := initMetrics()
 
 	err := info.Init()
 	if err != nil {

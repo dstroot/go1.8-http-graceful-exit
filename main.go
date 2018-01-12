@@ -23,6 +23,7 @@ func main() {
 	n.Use(negroni.NewLogger())
 	n.UseHandler(r) // pass mux to negroni
 
+	// Run our server
 	s := NewServer(info.Report.Port, n) // pass port and mux
 	err := s.Run()
 	if err != nil {
