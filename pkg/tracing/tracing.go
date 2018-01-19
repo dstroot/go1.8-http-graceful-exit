@@ -26,8 +26,8 @@ func Init(serviceName string, metricsFactory metrics.Factory) (opentracing.Trace
 		//   and indicates the initial sampling rate before the actual one
 		//   is received from the mothership
 		Sampler: &config.SamplerConfig{
-			Type:  "probabilistic",
-			Param: 0.2,
+			Type:  "const",
+			Param: 1,
 		},
 		Reporter: &config.ReporterConfig{
 			LogSpans:            false, // log all spans to stdout for debug purposes
