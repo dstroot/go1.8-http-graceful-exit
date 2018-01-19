@@ -32,7 +32,6 @@ package metrics
 // other middleware.
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 
@@ -116,6 +115,4 @@ func (m *Metrics) ServeHTTP(rw http.ResponseWriter, r *http.Request, next http.H
 	m.reqs.WithLabelValues(status, r.Method, r.URL.Path).Inc()
 	m.latency.WithLabelValues(status, r.Method, r.URL.Path).Observe(float64(time.Since(start).Nanoseconds()) / 1000000)
 	m.size.WithLabelValues().Observe(float64(res.Size()))
-
-	fmt.Println(res.Size())
 }
