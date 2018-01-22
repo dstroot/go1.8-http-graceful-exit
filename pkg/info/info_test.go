@@ -9,9 +9,9 @@ import (
 
 func TestGetPort(t *testing.T) {
 	// Check the port is what we expect.
-	if port := getPort(); port != DEFAULT_PORT {
+	if port := getPort(); port != defaultPort {
 		t.Errorf("Wrong port: got %v want %v",
-			port, DEFAULT_PORT)
+			port, defaultPort)
 	}
 }
 

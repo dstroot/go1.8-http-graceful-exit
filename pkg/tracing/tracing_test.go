@@ -12,11 +12,14 @@ import (
 
 func TestInit(t *testing.T) {
 
-	metricsFactory := xkit.Wrap("", expvar.NewFactory(10))
-	tracer, closer := Init(
+	metricsFactory := xkit.Wrap("test", expvar.NewFactory(10))
+	tracer, closer, err := Init(
 		"test",
 		metricsFactory.Namespace(info.Report.Program, nil),
 	)
+	if err != nil {
+		t.Error("Could not initialize tracer")
+	}
 
 	// start a new span
 	span := tracer.StartSpan("test")

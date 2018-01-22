@@ -153,8 +153,5 @@ func (r *Render) Template(w http.ResponseWriter, name string, data map[string]in
 	// Set the header and write the buffer to the http.ResponseWriter
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	_, err = buf.WriteTo(w)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }

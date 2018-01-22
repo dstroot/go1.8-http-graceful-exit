@@ -7,6 +7,10 @@ import (
 	"log"
 	"net/http"
 
+	// /debug/vars and /debug/pprof
+	_ "expvar"
+	_ "net/http/pprof"
+
 	"github.com/dstroot/simple-go-webserver/pkg/info"
 	"github.com/dstroot/simple-go-webserver/pkg/metrics"
 	"github.com/dstroot/simple-go-webserver/pkg/router"
@@ -23,6 +27,21 @@ var (
 )
 
 func main() {
+	// Let's put the expvar and pprof http server on a separate port on
+	// localhost, separate from the application http server. Both register
+	// handlers on the default mux automatically:
+	//  - http://localhost:6060/debug/vars
+	//  - http://localhost:6060/debug/pprof
+	go func() {
+		log.Println(http.ListenAndServe("localhost:6060", nil))
+	}()
+
+	// initialize program info
+	err := info.Init()
+	if err != nil {
+		log.Fatalf("info could not be initialized")
+	}
+
 	// create an HTTP router (a mux)
 	r := router.New()
 
@@ -35,10 +54,13 @@ func main() {
 
 	// create a tracer
 	metricsFactory = xkit.Wrap("", expvar.NewFactory(10)) // 10 buckets for histograms
-	tracer, closer := tracing.Init(
+	tracer, closer, err := tracing.Init(
 		info.Report.Program,
 		metricsFactory.Namespace(info.Report.Program, nil),
 	)
+	if err != nil {
+		log.Fatal(err)
+	}
 	defer closer.Close()
 
 	// instrument the router for tracing
@@ -52,7 +74,7 @@ func main() {
 
 	// run our server
 	s := NewServer(info.Report.Port, mw) // pass port and mux
-	err := s.Run()
+	err = s.Run()
 	if err != nil {
 		log.Fatal(err)
 	}

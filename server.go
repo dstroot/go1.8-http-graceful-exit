@@ -39,7 +39,7 @@ func NewServer(hostPort string, h http.Handler) *Server {
 	}
 }
 
-// Run starts the HTTP server
+// Run starts the HTTP server and performs a graceful shutdown
 func (s *Server) Run() error {
 
 	// Get hostname

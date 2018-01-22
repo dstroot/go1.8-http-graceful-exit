@@ -1,7 +1,6 @@
 package tracing
 
 import (
-	"fmt"
 	"io"
 	"time"
 
@@ -15,7 +14,7 @@ import (
 // https://github.com/jaegertracing/jaeger-client-go/blob/master/config/config.go
 
 // Init returns an instance of Jaeger Tracer
-func Init(serviceName string, metricsFactory metrics.Factory) (opentracing.Tracer, io.Closer) {
+func Init(serviceName string, metricsFactory metrics.Factory) (opentracing.Tracer, io.Closer, error) {
 	// create configuration
 	cfg := &config.Configuration{
 		// Valid values for Param field are:
@@ -42,10 +41,11 @@ func Init(serviceName string, metricsFactory metrics.Factory) (opentracing.Trace
 		config.Observer(rpcmetrics.NewObserver(metricsFactory, rpcmetrics.DefaultNameNormalizer)),
 	)
 	if err != nil {
-		panic(fmt.Sprintf("ERROR: cannot init Jaeger: %v\n", err))
+		return nil, nil, err
+		// panic(fmt.Sprintf("ERROR: cannot init Jaeger: %v\n", err))
 	}
 
-	return tracer, closer
+	return tracer, closer, nil
 }
 
 // Another feature that built into the the client libraries was the ability

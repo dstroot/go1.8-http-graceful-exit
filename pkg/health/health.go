@@ -16,7 +16,7 @@ import (
 func Handler(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
-	io.WriteString(w, `{"alive": true}`)
+	io.WriteString(w, `{"healthy": true}`)
 }
 
 // Ready supports a readiness probe.  For the readiness probe we might
@@ -41,5 +41,5 @@ func HandlerFunc() http.Handler {
 
 // ReadyFunc returns the info HTTP Handler.
 func ReadyFunc(isReady *atomic.Value) http.Handler {
-	return http.HandlerFunc(Ready(isReady))
+	return Ready(isReady)
 }

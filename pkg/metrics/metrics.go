@@ -102,7 +102,7 @@ func NewMetrics(host string, service string, buckets ...float64) *Metrics {
 	return &m
 }
 
-// Negroni middleware
+// Negroni middleware to capture prometheus stats
 func (m *Metrics) ServeHTTP(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	start := time.Now()
 

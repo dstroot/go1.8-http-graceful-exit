@@ -4,8 +4,6 @@ Package router implements a library to manage our application's routes.
 package router
 
 import (
-	"expvar"
-	"log"
 	"net/http"
 	"sync/atomic"
 
@@ -21,11 +19,6 @@ func New() *httprouter.Router {
 
 	r := httprouter.New()
 
-	err := info.Init()
-	if err != nil {
-		log.Fatalf("info could not be initialized")
-	}
-
 	// // Instrument the handlers with all the metrics, injecting the "handler"
 	// // label by currying.
 	// indexChain := promhttp.InstrumentHandlerDuration(m.duration.MustCurryWith(prometheus.Labels{"handler": "index"}),
@@ -38,9 +31,6 @@ func New() *httprouter.Router {
 	r.GET("/", handle.Index)
 	r.GET("/page", handle.Page)
 	r.GET("/hello/:name", handle.Hello)
-
-	// handler for serving expvar data
-	r.Handler("GET", "/debug", expvar.Handler())
 
 	// handler for serving info
 	r.Handler("GET", "/info", info.HandlerFunc())

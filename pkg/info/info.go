@@ -18,18 +18,21 @@ import (
 )
 
 const (
-	DEFAULT_PORT = "8000"
+	defaultPort = "8000"
 )
 
 var (
 	start = time.Now().UTC()
 
 	// BuildTime is a time label of the moment when the binary was built
-	BuildTime = "unset"
+	BuildTime = "not set"
+
 	// Commit is a last commit hash at the moment when the binary was built
-	Commit = "unset"
+	Commit = "not set"
+
 	// Version is a semantic version of current build
-	Version = "unset"
+	Version = "not set"
+
 	// Report exposes our metrics
 	Report Metrics
 )
@@ -51,7 +54,7 @@ type Metrics struct {
 func getPort() string {
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = DEFAULT_PORT
+		port = defaultPort
 	}
 	return port
 }
@@ -87,7 +90,7 @@ func Init() (err error) {
 }
 
 // Handler writes a JSON object with the current metrics
-func Handler(w http.ResponseWriter, r *http.Request) {
+func Handler(w http.ResponseWriter, _ *http.Request) {
 	Report.RunTime = fmt.Sprintf("%v", utility.RoundDuration(time.Since(start), time.Second))
 
 	j, err := json.MarshalIndent(Report, "", "    ")
