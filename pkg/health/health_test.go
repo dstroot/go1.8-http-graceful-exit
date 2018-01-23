@@ -7,6 +7,7 @@ import (
 	"sync/atomic"
 	"testing"
 	// . "github.com/smartystreets/goconvey/convey"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestHandler(t *testing.T) {
@@ -32,11 +33,14 @@ func TestHandler(t *testing.T) {
 	}
 
 	// Check the response body is what we expect.
-	expected := `{"alive": true}`
+	expected := `{"healthy": true}`
 	if rr.Body.String() != expected {
 		t.Errorf("handler returned unexpected body: got %v want %v",
 			rr.Body.String(), expected)
 	}
+
+	// using testify
+	assert.Equal(t, `{"healthy": true}`, rr.Body.String(), "body should equal expected result")
 }
 
 func TestReady(t *testing.T) {

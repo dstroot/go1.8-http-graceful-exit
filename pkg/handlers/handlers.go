@@ -84,11 +84,10 @@ func NotFound(w http.ResponseWriter, r *http.Request) {
 	// page data to render page
 	data := map[string]interface{}{
 		"title": "404",
-		"Key":   "Value",
-		"Slice": []string{"One", "Two", "Three"},
 	}
 
 	// render page template
+	w.WriteHeader(404)
 	err := Render.Template(w, "404.html", data)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

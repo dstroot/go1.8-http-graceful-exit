@@ -14,3 +14,10 @@ func TestMain(m *testing.M) {
 	// shutdown()
 	os.Exit(code)
 }
+
+func TestRun(t *testing.T) {
+	err := run()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+}

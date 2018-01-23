@@ -53,7 +53,8 @@ func (s *Server) Run() error {
 
 	// Run server
 	go func() {
-		log.Printf("%s - Starting server on port %v", hostname, s.server.Addr)
+		log.Printf("%s - Web server available on port %v", hostname, s.server.Addr)
+		log.Printf("%s - Press Ctrl+C to stop", hostname)
 		listenErr <- s.server.ListenAndServe()
 	}()
 
@@ -64,13 +65,13 @@ func (s *Server) Run() error {
 	// Handle channels/graceful shutdown
 	for {
 		select {
-		// If server.ListenAndServe() cannot startup due to errors
-		// such as "port in use" it will return an error.
+		// If server.ListenAndServe() cannot start due to errors such as "port
+		// in use" it will return an error.
 		case err := <-listenErr:
 			return err
 		// handle termination signal
 		case <-osSignals:
-			fmt.Println("")
+			fmt.Printf("\n")
 			log.Printf("%s - Shutdown signal received.\n", hostname)
 
 			// Servers in the process of shutting down should disable KeepAlives.
