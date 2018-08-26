@@ -19,6 +19,7 @@ import (
 	stats "github.com/uber/jaeger-lib/metrics"
 	"github.com/uber/jaeger-lib/metrics/go-kit"
 	"github.com/uber/jaeger-lib/metrics/go-kit/expvar"
+	// "github.com/unrolled/secure"
 	"github.com/urfave/negroni"
 )
 
@@ -45,11 +46,20 @@ func main() {
 	// create an HTTP router (a mux)
 	r := router.New()
 
+	// // initialize security
+	// secureMiddleware := secure.New(secure.Options{
+	// 	FrameDeny:          true,
+	// 	ContentTypeNosniff: true, // If ContentTypeNosniff is true, adds the X-Content-Type-Options header with the value `nosniff`. Default is false.
+	// 	BrowserXssFilter:   true, // If BrowserXssFilter is true, adds the X-XSS-Protection header with the value `1; mode=block`. Default is false.
+	// 	// ContentSecurityPolicy: "default-src 'self'", // ContentSecurityPolicy allows the Content-Security-Policy header value to be set with a custom value. Default is "". Passing a template string will replace `$NONCE` with a dynamic nonce value of 16 bytes for each request which can be later retrieved using the Nonce function.
+	// })
+
 	// negroni middleware stack
 	n := negroni.New()
 	n.Use(negroni.NewRecovery())
 	n.Use(metrics.NewMetrics(info.Report.HostName, info.Report.Program))
 	n.Use(negroni.NewLogger())
+	// n.Use(negroni.HandlerFunc(secureMiddleware.HandlerFuncWithNext))
 	n.UseHandler(r) // pass mux to negroni
 
 	// create a tracer

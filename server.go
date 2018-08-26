@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"runtime/debug"
+	"strings"
 	"syscall"
 	"time"
 
@@ -25,8 +27,22 @@ type Server struct {
 	server *http.Server
 }
 
+// debugging multiple response.WriteHeader calls
+type debugLogger struct{}
+
+func (d debugLogger) Write(p []byte) (n int, err error) {
+	s := string(p)
+	if strings.Contains(s, "multiple response.WriteHeader") {
+		debug.PrintStack()
+	}
+	return os.Stderr.Write(p)
+}
+
 // NewServer creates a new HTTP Server
 func NewServer(hostPort string, h http.Handler) *Server {
+	// Now use the logger with your http.Server:
+	logger := log.New(debugLogger{}, "", 0)
+
 	return &Server{
 		server: &http.Server{
 			Addr:           ":" + hostPort,
@@ -35,6 +51,7 @@ func NewServer(hostPort string, h http.Handler) *Server {
 			WriteTimeout:   10 * time.Second,
 			IdleTimeout:    120 * time.Second, // Go ver >1.8
 			MaxHeaderBytes: 1 << 20,
+			ErrorLog:       logger,
 		},
 	}
 }
